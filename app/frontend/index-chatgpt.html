@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volentis Interview Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-enter {
+            animation: slideIn 0.3s ease;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .sidebar-collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+        
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+        }
+        
+        body.dark-mode .bg-white {
+            background-color: #2d2d2d !important;
+        }
+        
+        body.dark-mode .bg-gray-50 {
+            background-color: #1a1a1a !important;
+        }
+        
+        body.dark-mode .bg-gray-100 {
+            background-color: #2d2d2d !important;
+        }
+        
+        body.dark-mode .bg-gray-200 {
+            background-color: #3d3d3d !important;
+        }
+        
+        body.dark-mode .text-gray-600 {
+            color: #a0a0a0 !important;
+        }
+        
+        body.dark-mode .text-gray-700 {
+            color: #b0b0b0 !important;
+        }
+        
+        body.dark-mode .text-gray-800 {
+            color: #d0d0d0 !important;
+        }
+        
+        body.dark-mode .text-gray-900 {
+            color: #e5e5e5 !important;
+        }
+        
+        body.dark-mode .border-gray-200 {
+            border-color: #3d3d3d !important;
+        }
+        
+        body.dark-mode .border-gray-300 {
+            border-color: #4d4d4d !important;
+        }
+        
+        body.dark-mode .hover\:bg-gray-100:hover {
+            background-color: #3d3d3d !important;
+        }
+        
+        body.dark-mode .hover\:bg-gray-200:hover {
+            background-color: #4d4d4d !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen overflow-hidden transition-colors duration-300">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="w-64 bg-gray-900 text-white flex flex-col transition-all duration-300">
+            <!-- Sidebar Header -->
+            <div class="p-4 border-b border-gray-700">
+                <button onclick="newSession()" class="w-full flex items-center gap-3 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span class="font-medium">Nieuw Interview</span>
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="px-4 py-3 border-b border-gray-700">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="sessionSearch"
+                        placeholder="Zoek sessies..."
+                        class="w-full bg-gray-800 text-white text-sm px-4 py-2 pl-10 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        oninput="filterSessions(this.value)"
+                        onkeydown="handleSearchKeydown(event)"
+                    />
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <button 
+                        id="clearSearch"
+                        onclick="clearSearch()"
+                        class="absolute right-3 top-2.5 text-gray-400 hover:text-white hidden"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sessions List -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
+                <div class="text-xs font-semibold text-gray-400 px-3 mb-2">RECENTE SESSIES</div>
+                <div id="sessionsList" class="space-y-1">
+                    <!-- Sessions will be loaded here -->
+                </div>
+                <div id="noResults" class="hidden text-sm text-gray-500 px-3 py-4 text-center">
+                    Geen sessies gevonden
+                </div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex items-center gap-3 px-3 py-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
+                        V
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium truncate">Volentis HR</div>
+                        <div class="text-xs text-gray-400">Interview Agent</div>
+                    </div>
+                </div>
+                
+                <!-- Dark Mode Toggle -->
+                <button 
+                    onclick="toggleDarkMode()"
+                    class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm"
+                    title="Toggle Dark Mode"
+                >
+                    <div class="flex items-center gap-2">
+                        <svg id="darkModeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                        <span id="darkModeText">Dark Mode</span>
+                    </div>
+                    <div id="darkModeToggle" class="relative w-10 h-5 bg-gray-700 rounded-full transition-colors">
+                        <div id="darkModeSlider" class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform"></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Top Bar -->
+            <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <div class="flex-1">
+                    <h1 id="sessionTitle" class="text-lg font-semibold text-gray-800">Volentis Interview Agent</h1>
+                    <div id="sessionSubtitle" class="text-sm text-gray-500">Start een nieuw interview om te beginnen</div>
+                </div>
+                <div id="progressIndicator" class="hidden flex items-center gap-3">
+                    <div class="text-right">
+                        <div class="text-xs text-gray-500">Voortgang</div>
+                        <div id="progressPercent" class="text-sm font-semibold text-gray-800">0%</div>
+                    </div>
+                    <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="progressBarTop" class="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- Interview Controls -->
+                <div id="interviewControls" class="hidden flex items-center gap-2">
+                    <button 
+                        id="backButton"
+                        onclick="goBackToPreviousQuestion()"
+                        class="hidden px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
+                        title="Terug naar vorige vraag"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Terug
+                    </button>
+                    <button 
+                        id="pauseButton"
+                        onclick="pauseInterview()"
+                        class="px-4 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                        title="Pauzeer interview"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Pauzeren
+                    </button>
+                    <button 
+                        id="resumeButton"
+                        onclick="resumeInterview()"
+                        class="hidden px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                        title="Hervat interview"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Hervatten
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="messagesContainer" class="flex-1 overflow-y-auto custom-scrollbar">
+                <!-- Welcome Screen -->
+                <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center p-8 text-center">
+                    <div class="max-w-2xl space-y-6">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-3">Welkom bij Volentis Interview Agent</h2>
+                            <p class="text-lg text-gray-600">Ik help je met het opstellen van een compleet implementatieplan en HR-verbeter-roadmap</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                            <div class="bg-white p-5 rounded-xl border border-gray-200 hover:border-blue-300 transition-colors">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="font-semibold text-gray-900 mb-1">Implementatieplan</h3>
+                                <p class="text-sm text-gray-600">Compleet plan voor Volentis HR Agent</p>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
+                                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="font-semibold text-gray-900 mb-1">HR Roadmap</h3>
+                                <p class="text-sm text-gray-600">Quick wins en strategische projecten</p>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-xl border border-gray-200 hover:border-green-300 transition-colors">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="font-semibold text-gray-900 mb-1">45-60 minuten</h3>
+                                <p class="text-sm text-gray-600">11 fases, pauzeren mogelijk</p>
+                            </div>
+                        </div>
+
+                        <button onclick="startNewInterview()" class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <span>Start Interview</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="hidden max-w-3xl mx-auto py-8 px-4 space-y-6">
+                    <!-- Messages will be added here -->
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div id="inputArea" class="hidden border-t border-gray-200 bg-white">
+                <div class="max-w-3xl mx-auto p-4">
+                    <div class="flex gap-3 items-end">
+                        <div class="flex-1 relative">
+                            <textarea 
+                                id="userInput" 
+                                placeholder="Type je antwoord..."
+                                rows="1"
+                                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none max-h-32"
+                                onkeydown="handleInputKeydown(event)"
+                                oninput="autoResize(this)"
+                            ></textarea>
+                            <button 
+                                id="sendButton"
+                                onclick="sendMessage()" 
+                                class="absolute right-2 bottom-2 p-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- AI Suggestions -->
+                    <div id="aiSuggestions" class="hidden mt-3 flex flex-wrap gap-2">
+                        <div class="text-xs text-gray-500 font-medium mb-1 w-full flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                            AI Suggesties:
+                        </div>
+                        <div id="suggestionChips" class="flex flex-wrap gap-2">
+                            <!-- Suggestion chips will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500 mt-2 text-center">
+                        Druk op Enter om te versturen, Shift+Enter voor een nieuwe regel
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="customModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+                        <!-- Icon will be inserted here -->
+                    </div>
+                    <div class="flex-1">
+                        <h3 id="modalTitle" class="text-xl font-semibold text-gray-900"></h3>
+                        <p id="modalMessage" class="text-sm text-gray-600 mt-1"></p>
+                    </div>
+                </div>
+                <div id="modalButtons" class="flex gap-3 justify-end mt-6">
+                    <!-- Buttons will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessions = [];
+        let currentSessionId = null;
+        let ws = null;
+        let isPaused = false;
+        let messageHistory = [];  // Track all messages for back navigation
+        let currentQuestion = '';  // Track current question for suggestions
+        let conversationContext = {
+            sector: '',
+            role: '',
+            challenges: [],
+            hasSystem: null
+        };  // Track conversation context for better suggestions
+        let modalResolve = null;
+
+        // Custom Modal Functions
+        function showModal(title, message, type = 'info', buttons = []) {
+            return new Promise((resolve) => {
+                modalResolve = resolve;
+                
+                const modal = document.getElementById('customModal');
+                const modalIcon = document.getElementById('modalIcon');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalMessage = document.getElementById('modalMessage');
+                const modalButtons = document.getElementById('modalButtons');
+                
+                // Set icon based on type
+                let iconHTML = '';
+                let iconBgClass = '';
+                
+                if (type === 'confirm') {
+                    iconBgClass = 'bg-blue-100';
+                    iconHTML = `<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>`;
+                } else if (type === 'error') {
+                    iconBgClass = 'bg-red-100';
+                    iconHTML = `<svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>`;
+                } else if (type === 'success') {
+                    iconBgClass = 'bg-green-100';
+                    iconHTML = `<svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>`;
+                } else {
+                    iconBgClass = 'bg-gray-100';
+                    iconHTML = `<svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>`;
+                }
+                
+                modalIcon.className = `w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${iconBgClass}`;
+                modalIcon.innerHTML = iconHTML;
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                
+                // Set buttons
+                modalButtons.innerHTML = buttons.map(btn => {
+                    const btnClass = btn.primary 
+                        ? 'px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg'
+                        : 'px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200';
+                    
+                    return `<button onclick="closeModal(${btn.value})" class="${btnClass}">${btn.label}</button>`;
+                }).join('');
+                
+                modal.classList.remove('hidden');
+            });
+        }
+
+        function closeModal(value) {
+            const modal = document.getElementById('customModal');
+            modal.classList.add('hidden');
+            if (modalResolve) {
+                modalResolve(value);
+                modalResolve = null;
+            }
+        }
+
+        // Load sessions from localStorage and verify with server
+        async function loadSessions() {
+            const stored = localStorage.getItem('volentis_sessions');
+            if (stored) {
+                sessions = JSON.parse(stored);
+                
+                // Verify sessions still exist on server
+                const validSessions = [];
+                for (const session of sessions) {
+                    try {
+                        const response = await fetch(`http://localhost:8000/api/session/${session.id}`);
+                        if (response.ok) {
+                            validSessions.push(session);
+                        }
+                    } catch (error) {
+                        console.log(`Session ${session.id} not found on server`);
+                    }
+                }
+                
+                sessions = validSessions;
+                filteredSessions = sessions;  // Reset filter
+                saveSessions();
+                renderSessions();
+            }
+        }
+
+        // Save sessions to localStorage
+        function saveSessions() {
+            localStorage.setItem('volentis_sessions', JSON.stringify(sessions));
+        }
+
+        // Filter sessions based on search query
+        let filteredSessions = sessions;
+        
+        function filterSessions(query) {
+            const searchInput = document.getElementById('sessionSearch');
+            const clearBtn = document.getElementById('clearSearch');
+            const noResults = document.getElementById('noResults');
+            
+            // Show/hide clear button
+            if (query) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            
+            // Filter sessions
+            if (query.trim() === '') {
+                filteredSessions = sessions;
+            } else {
+                const lowerQuery = query.toLowerCase();
+                filteredSessions = sessions.filter(session => {
+                    return session.title.toLowerCase().includes(lowerQuery) ||
+                           session.date.toLowerCase().includes(lowerQuery) ||
+                           session.id.toLowerCase().includes(lowerQuery);
+                });
+            }
+            
+            // Show/hide no results message
+            if (filteredSessions.length === 0 && query.trim() !== '') {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+            
+            renderSessions();
+        }
+        
+        function clearSearch() {
+            const searchInput = document.getElementById('sessionSearch');
+            searchInput.value = '';
+            filterSessions('');
+            searchInput.focus();
+        }
+        
+        function handleSearchKeydown(event) {
+            if (event.key === 'Escape') {
+                clearSearch();
+            }
+        }
+
+        // Render sessions list
+        function renderSessions() {
+            const list = document.getElementById('sessionsList');
+            if (sessions.length === 0) {
+                list.innerHTML = '<div class="text-sm text-gray-500 px-3 py-2">Nog geen sessies</div>';
+                return;
+            }
+            
+            if (filteredSessions.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+
+            list.innerHTML = filteredSessions.map(session => `
+                <div class="group relative flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors ${session.id === currentSessionId ? 'bg-gray-800' : ''}">
+                    <button 
+                        onclick="loadSession('${session.id}')"
+                        class="flex-1 text-left min-w-0"
+                    >
+                        <div class="text-sm font-medium truncate">${escapeHtml(session.title)}</div>
+                        <div class="text-xs text-gray-400">${session.date}</div>
+                    </button>
+                    <div class="relative opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                            onclick="event.stopPropagation(); toggleSessionMenu('${session.id}')"
+                            class="p-1.5 hover:bg-gray-700 rounded transition-all"
+                            title="Opties"
+                        >
+                            <svg class="w-4 h-4 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                            </svg>
+                        </button>
+                        <div id="menu-${session.id}" class="hidden absolute right-0 mt-1 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-50">
+                            <button 
+                                onclick="event.stopPropagation(); exportSessionPDF('${session.id}'); closeSessionMenu('${session.id}')"
+                                class="w-full flex items-center gap-2 px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-t-lg transition-colors"
+                            >
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Export naar PDF
+                            </button>
+                            <button 
+                                onclick="event.stopPropagation(); renameSession('${session.id}'); closeSessionMenu('${session.id}')"
+                                class="w-full flex items-center gap-2 px-4 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
+                            >
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                                Hernoemen
+                            </button>
+                            <button 
+                                onclick="event.stopPropagation(); deleteSession('${session.id}'); closeSessionMenu('${session.id}')"
+                                class="w-full flex items-center gap-2 px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-b-lg transition-colors"
+                            >
+                                <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Verwijderen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle session menu
+        function toggleSessionMenu(sessionId) {
+            const menu = document.getElementById(`menu-${sessionId}`);
+            const allMenus = document.querySelectorAll('[id^="menu-"]');
+            
+            // Close all other menus
+            allMenus.forEach(m => {
+                if (m.id !== `menu-${sessionId}`) {
+                    m.classList.add('hidden');
+                }
+            });
+            
+            // Toggle current menu
+            menu.classList.toggle('hidden');
+        }
+        
+        // Close session menu
+        function closeSessionMenu(sessionId) {
+            const menu = document.getElementById(`menu-${sessionId}`);
+            if (menu) {
+                menu.classList.add('hidden');
+            }
+        }
+        
+        // Close all menus when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('[id^="menu-"]') && !e.target.closest('button[onclick*="toggleSessionMenu"]')) {
+                const allMenus = document.querySelectorAll('[id^="menu-"]');
+                allMenus.forEach(menu => menu.classList.add('hidden'));
+            }
+        });
+
+        // Rename session
+        async function renameSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) return;
+            
+            // Create custom input modal
+            const modal = document.getElementById('customModal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalButtons = document.getElementById('modalButtons');
+            
+            // Set icon
+            modalIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-purple-100';
+            modalIcon.innerHTML = `<svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>`;
+            
+            modalTitle.textContent = 'Sessie Hernoemen';
+            modalMessage.innerHTML = `
+                <input 
+                    type="text" 
+                    id="sessionNameInput" 
+                    value="${escapeHtml(session.title)}"
+                    class="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Voer een nieuwe naam in..."
+                    onkeydown="if(event.key === 'Enter') document.getElementById('saveNameBtn').click()"
+                />
+            `;
+            
+            modalButtons.innerHTML = `
+                <button onclick="closeModal(false)" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200">
+                    Annuleren
+                </button>
+                <button id="saveNameBtn" onclick="saveSessionName('${sessionId}')" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                    Opslaan
+                </button>
+            `;
+            
+            modal.classList.remove('hidden');
+            
+            // Focus input after modal opens
+            setTimeout(() => {
+                const input = document.getElementById('sessionNameInput');
+                input.focus();
+                input.select();
+            }, 100);
+        }
+        
+        // Save session name
+        function saveSessionName(sessionId) {
+            const input = document.getElementById('sessionNameInput');
+            const newName = input.value.trim();
+            
+            if (!newName) {
+                return;
+            }
+            
+            const session = sessions.find(s => s.id === sessionId);
+            if (session) {
+                session.title = newName;
+                saveSessions();
+                renderSessions();
+                
+                // Update title if this is the current session
+                if (sessionId === currentSessionId) {
+                    document.getElementById('sessionTitle').textContent = newName;
+                }
+            }
+            
+            closeModal(true);
+        }
+
+        // Export session to PDF
+        async function exportSessionPDF(sessionId) {
+            try {
+                // Show loading message (without await so it doesn't block)
+                showModal(
+                    'PDF Genereren',
+                    'Even geduld, het PDF rapport wordt gegenereerd...',
+                    'info',
+                    []
+                );
+                
+                // Small delay to show modal
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Fetch session data
+                const response = await fetch(`http://localhost:8000/api/session/${sessionId}/export`);
+                if (!response.ok) {
+                    throw new Error('Sessie niet gevonden');
+                }
+                
+                const sessionData = await response.json();
+                const session = sessions.find(s => s.id === sessionId);
+                
+                // Generate PDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                let yPos = 20;
+                const pageWidth = doc.internal.pageSize.width;
+                const margin = 20;
+                const maxWidth = pageWidth - (margin * 2);
+                
+                // Header
+                doc.setFontSize(20);
+                doc.setTextColor(59, 130, 246); // Blue
+                doc.text('Volentis HR Implementation Interview', margin, yPos);
+                yPos += 10;
+                
+                // Subtitle
+                doc.setFontSize(12);
+                doc.setTextColor(100, 100, 100);
+                doc.text('Interview Rapport', margin, yPos);
+                yPos += 15;
+                
+                // Session Info
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Sessie: ${session.title}`, margin, yPos);
+                yPos += 7;
+                doc.text(`Datum: ${session.date}`, margin, yPos);
+                yPos += 7;
+                doc.text(`Status: ${sessionData.status === 'completed' ? 'Voltooid' : 'In uitvoering'}`, margin, yPos);
+                yPos += 15;
+                
+                // Divider
+                doc.setDrawColor(200, 200, 200);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 10;
+                
+                // Conversation
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0);
+                doc.text('Interview Conversatie', margin, yPos);
+                yPos += 10;
+                
+                if (sessionData.conversation_history && sessionData.conversation_history.length > 0) {
+                    sessionData.conversation_history.forEach((msg, index) => {
+                        // Check if we need a new page
+                        if (yPos > 270) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        
+                        // Role label
+                        doc.setFontSize(10);
+                        if (msg.role === 'user') {
+                            doc.setTextColor(59, 130, 246); // Blue
+                            doc.text('Gebruiker:', margin, yPos);
+                        } else {
+                            doc.setTextColor(147, 51, 234); // Purple
+                            doc.text('Agent:', margin, yPos);
+                        }
+                        yPos += 7;
+                        
+                        // Message content
+                        doc.setFontSize(9);
+                        doc.setTextColor(0, 0, 0);
+                        const lines = doc.splitTextToSize(msg.content, maxWidth);
+                        doc.text(lines, margin, yPos);
+                        yPos += (lines.length * 5) + 5;
+                        
+                        // Space between messages
+                        yPos += 3;
+                    });
+                } else {
+                    doc.setFontSize(10);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text('Geen conversatie geschiedenis beschikbaar.', margin, yPos);
+                    yPos += 10;
+                }
+                
+                // Footer on last page
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(
+                        `Pagina ${i} van ${pageCount} - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`,
+                        pageWidth / 2,
+                        doc.internal.pageSize.height - 10,
+                        { align: 'center' }
+                    );
+                }
+                
+                // Save PDF
+                const fileName = `Volentis_Interview_${session.title.replace(/[^a-z0-9]/gi, '_')}_${session.date.replace(/\//g, '-')}.pdf`;
+                doc.save(fileName);
+                
+                // Close loading modal and show success
+                closeModal(true);
+                await showModal(
+                    'PDF Gegenereerd',
+                    `Het rapport is succesvol gedownload als "${fileName}".`,
+                    'success',
+                    [{ label: 'OK', value: true, primary: true }]
+                );
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                closeModal(true);
+                await showModal(
+                    'Fout bij PDF Generatie',
+                    'Er is een fout opgetreden bij het genereren van het PDF rapport: ' + error.message,
+                    'error',
+                    [{ label: 'OK', value: true, primary: true }]
+                );
+            }
+        }
+
+        // Delete session
+        async function deleteSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) return;
+            
+            const result = await showModal(
+                'Sessie Verwijderen?',
+                `Weet je zeker dat je "${session.title}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`,
+                'error',
+                [
+                    { label: 'Annuleren', value: false, primary: false },
+                    { label: 'Verwijderen', value: true, primary: true }
+                ]
+            );
+            
+            if (result) {
+                // Remove from sessions array
+                sessions = sessions.filter(s => s.id !== sessionId);
+                filteredSessions = sessions;  // Update filtered sessions too
+                saveSessions();
+                renderSessions();
+                
+                // If this was the current session, show welcome screen
+                if (sessionId === currentSessionId) {
+                    // Close WebSocket
+                    if (ws) {
+                        ws.close();
+                        ws = null;
+                    }
+                    
+                    // Reset to welcome screen
+                    document.getElementById('welcomeScreen').classList.remove('hidden');
+                    document.getElementById('chatMessages').classList.add('hidden');
+                    document.getElementById('inputArea').classList.add('hidden');
+                    document.getElementById('progressIndicator').classList.add('hidden');
+                    
+                    // Reset title
+                    document.getElementById('sessionTitle').textContent = 'Volentis Interview Agent';
+                    document.getElementById('sessionSubtitle').textContent = 'Start een nieuw interview om te beginnen';
+                    
+                    currentSessionId = null;
+                }
+                
+                // Show success message
+                await showModal(
+                    'Sessie Verwijderd',
+                    'De sessie is succesvol verwijderd.',
+                    'success',
+                    [{ label: 'OK', value: true, primary: true }]
+                );
+            }
+        }
+
+        // Pause/Resume Interview
+        function pauseInterview() {
+            isPaused = true;
+            
+            // Hide pause button, show resume button
+            document.getElementById('pauseButton').classList.add('hidden');
+            document.getElementById('resumeButton').classList.remove('hidden');
+            
+            // Disable input
+            const input = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendButton');
+            input.disabled = true;
+            input.placeholder = 'Interview gepauzeerd - klik op "Hervatten" om verder te gaan';
+            sendBtn.disabled = true;
+            
+            // Show notification
+            showModal(
+                'Interview Gepauzeerd',
+                'Je kunt op elk moment hervatten waar je was gebleven. Je voortgang is opgeslagen.',
+                'info',
+                [{ label: 'OK', value: true, primary: true }]
+            );
+        }
+        
+        function resumeInterview() {
+            isPaused = false;
+            
+            // Hide resume button, show pause button
+            document.getElementById('resumeButton').classList.add('hidden');
+            document.getElementById('pauseButton').classList.remove('hidden');
+            
+            // Enable input
+            const input = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendButton');
+            input.disabled = false;
+            input.placeholder = 'Type je antwoord...';
+            sendBtn.disabled = false;
+            input.focus();
+        }
+        
+        // Back Navigation
+        function goBackToPreviousQuestion() {
+            if (messageHistory.length < 2) {
+                showModal(
+                    'Geen Vorige Vraag',
+                    'Je bent al bij de eerste vraag van het interview.',
+                    'info',
+                    [{ label: 'OK', value: true, primary: true }]
+                );
+                return;
+            }
+            
+            // Remove last 2 messages (user answer + agent question)
+            messageHistory.pop();
+            messageHistory.pop();
+            
+            // Re-render messages
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            messageHistory.forEach(msg => {
+                addMessage(msg.role, msg.content);
+            });
+            
+            // Update back button visibility
+            updateBackButtonVisibility();
+            
+            // Focus input
+            document.getElementById('userInput').focus();
+        }
+        
+        function updateBackButtonVisibility() {
+            const backBtn = document.getElementById('backButton');
+            // Show back button if we have at least 2 messages (welcome + first Q&A)
+            if (messageHistory.length >= 4) {
+                backBtn.classList.remove('hidden');
+            } else {
+                backBtn.classList.add('hidden');
+            }
+        }
+
+        // AI Suggestions
+        async function generateSuggestions(question) {
+            // First hide any existing suggestions
+            hideSuggestions();
+            
+            currentQuestion = question;
+            
+            // Fetch AI-generated suggestions from API
+            try {
+                const response = await fetch(`http://localhost:8000/api/session/${currentSessionId}/suggestions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        question: question
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        showSuggestions(data.suggestions);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+            }
+            
+            // Fallback to generic suggestions if API fails
+            const fallbackSuggestions = [
+                'Ja, dat klopt',
+                'Nee, nog niet',
+                'Deels, laat me toelichten',
+                'Weet ik niet zeker'
+            ];
+            
+            showSuggestions(fallbackSuggestions);
+        }
+        
+        function showSuggestions(suggestions) {
+            const container = document.getElementById('aiSuggestions');
+            const chipsContainer = document.getElementById('suggestionChips');
+            
+            if (suggestions.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            chipsContainer.innerHTML = suggestions.map(suggestion => `
+                <button 
+                    onclick="useSuggestion('${escapeHtml(suggestion).replace(/'/g, "\\'")}')"
+                    class="px-4 py-2 bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 text-gray-700 rounded-full text-sm border border-purple-200 hover:border-purple-300 transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2"
+                >
+                    <svg class="w-3 h-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    ${escapeHtml(suggestion)}
+                </button>
+            `).join('');
+            
+            container.classList.remove('hidden');
+            
+            // Auto-scroll to show the last message and suggestions
+            // Wait a bit longer to ensure suggestions are rendered and layout is stable
+            setTimeout(() => {
+                const chatMessages = document.getElementById('chatMessages');
+                const messages = chatMessages.querySelectorAll('.message');
+                if (messages.length > 0) {
+                    const lastMessage = messages[messages.length - 1];
+                    lastMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 400);
+        }
+        
+        function useSuggestion(suggestion) {
+            const input = document.getElementById('userInput');
+            
+            // If input is empty, just set the suggestion
+            if (!input.value.trim()) {
+                input.value = suggestion;
+            } else {
+                // If input has content, append with comma
+                input.value = input.value.trim() + ', ' + suggestion;
+            }
+            
+            input.focus();
+            autoResize(input);
+            
+            // Don't hide suggestions - allow multiple selections
+            // User can manually hide by typing or sending
+        }
+        
+        function hideSuggestions() {
+            const container = document.getElementById('aiSuggestions');
+            container.classList.add('hidden');
+            // Also clear the suggestions
+            document.getElementById('suggestionChips').innerHTML = '';
+        }
+        
+        // Update conversation context based on user answers
+        function updateContext(userMessage) {
+            const msg = userMessage.toLowerCase();
+            
+            // Detect sector
+            if (msg.includes('tech') || msg.includes('technologie')) {
+                conversationContext.sector = 'tech';
+            } else if (msg.includes('zorg') || msg.includes('healthcare')) {
+                conversationContext.sector = 'zorg';
+            } else if (msg.includes('productie') || msg.includes('manufacturing')) {
+                conversationContext.sector = 'productie';
+            }
+            
+            // Detect role
+            if (msg.includes('hr manager')) {
+                conversationContext.role = 'hr manager';
+            } else if (msg.includes('business partner')) {
+                conversationContext.role = 'business partner';
+            } else if (msg.includes('director')) {
+                conversationContext.role = 'director';
+            }
+            
+            // Detect challenges
+            if (msg.includes('repetitieve') || msg.includes('repetitive')) {
+                conversationContext.challenges.push('repetitieve');
+            }
+            if (msg.includes('werkdruk') || msg.includes('workload')) {
+                conversationContext.challenges.push('werkdruk');
+            }
+            if (msg.includes('onboarding')) {
+                conversationContext.challenges.push('onboarding');
+            }
+            if (msg.includes('inconsistent') || msg.includes('informatie')) {
+                conversationContext.challenges.push('inconsistent');
+            }
+        }
+
+        // Dark Mode
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+        
+        function initDarkMode() {
+            // Check system preference if no saved preference
+            if (localStorage.getItem('darkMode') === null) {
+                isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                updateDarkModeUI(true);
+            }
+        }
+        
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('darkMode', isDarkMode);
+            
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            
+            updateDarkModeUI(isDarkMode);
+        }
+        
+        function updateDarkModeUI(dark) {
+            const toggle = document.getElementById('darkModeToggle');
+            const slider = document.getElementById('darkModeSlider');
+            const icon = document.getElementById('darkModeIcon');
+            const text = document.getElementById('darkModeText');
+            
+            if (dark) {
+                toggle.classList.add('bg-blue-600');
+                toggle.classList.remove('bg-gray-700');
+                slider.style.transform = 'translateX(20px)';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+                text.textContent = 'Light Mode';
+            } else {
+                toggle.classList.remove('bg-blue-600');
+                toggle.classList.add('bg-gray-700');
+                slider.style.transform = 'translateX(0)';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+                text.textContent = 'Dark Mode';
+            }
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('sidebar-collapsed');
+        }
+
+        // New session
+        async function newSession() {
+            if (currentSessionId && ws) {
+                const result = await showModal(
+                    'Nieuw Interview Starten?',
+                    'De huidige sessie wordt opgeslagen en je kunt er later naar terugkeren.',
+                    'confirm',
+                    [
+                        { label: 'Annuleren', value: false, primary: false },
+                        { label: 'Start Nieuw Interview', value: true, primary: true }
+                    ]
+                );
+                
+                if (result) {
+                    // Close current WebSocket
+                    if (ws) {
+                        ws.close();
+                        ws = null;
+                    }
+                    
+                    // Reset UI
+                    document.getElementById('chatMessages').innerHTML = '';
+                    currentSessionId = null;
+                    
+                    // Start new interview
+                    startNewInterview();
+                }
+            } else {
+                // No active session, just start new
+                startNewInterview();
+            }
+        }
+
+        // Start new interview
+        async function startNewInterview() {
+            // Reset state
+            messageHistory = [];
+            isPaused = false;
+            conversationContext = { sector: '', role: '', challenges: [], hasSystem: null };
+            
+            // Hide welcome, show chat
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('chatMessages').classList.remove('hidden');
+            document.getElementById('inputArea').classList.remove('hidden');
+            document.getElementById('progressIndicator').classList.remove('hidden');
+            document.getElementById('interviewControls').classList.remove('hidden');
+
+            // Create session
+            const response = await fetch('http://localhost:8000/api/session/start', {
+                method: 'POST'
+            });
+            const data = await response.json();
+            currentSessionId = data.session_id;
+
+            // Add to sessions list (title will be updated after first message)
+            const newSession = {
+                id: currentSessionId,
+                title: 'Nieuw Interview',
+                date: new Date().toLocaleDateString('nl-NL'),
+                timestamp: Date.now(),
+                messageCount: 0
+            };
+            sessions.unshift(newSession);
+            saveSessions();
+            renderSessions();
+
+            // Update UI
+            document.getElementById('sessionTitle').textContent = 'Interview in uitvoering';
+            document.getElementById('sessionSubtitle').textContent = 'Fase 1/11: Intro & context';
+
+            // Connect WebSocket
+            ws = new WebSocket(`ws://localhost:8000/ws/interview/${currentSessionId}`);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'agent_message') {
+                    addMessage(data.content, 'agent');
+                    updateProgress(data.progress, data.fase, data.fase_name);
+                    
+                    // Generate AI suggestions based on the question (with small delay)
+                    setTimeout(() => generateSuggestions(data.content), 300);
+                } else if (data.type === 'error') {
+                    addMessage('Sorry, er ging iets mis: ' + data.message, 'system');
+                } else if (data.type === 'interview_complete') {
+                    addMessage(data.message, 'system');
+                    updateProgress(100, 11, 'Voltooid');
+                    hideSuggestions();
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                addMessage('Verbindingsfout. Probeer de pagina te verversen.', 'system');
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket closed');
+            };
+        }
+
+        // Load existing session
+        async function loadSession(sessionId) {
+            try {
+                // Fetch session data from backend
+                const response = await fetch(`http://localhost:8000/api/session/${sessionId}/export`);
+                if (!response.ok) {
+                    await showModal(
+                        'Sessie Niet Gevonden',
+                        'Deze sessie kon niet worden geladen van de server.',
+                        'error',
+                        [{ label: 'OK', value: true, primary: true }]
+                    );
+                    return;
+                }
+                
+                const sessionData = await response.json();
+                
+                // Show chat interface
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('chatMessages').classList.remove('hidden');
+                document.getElementById('inputArea').classList.remove('hidden');
+                document.getElementById('progressIndicator').classList.remove('hidden');
+                
+                // Clear existing messages
+                document.getElementById('chatMessages').innerHTML = '';
+                
+                // Set current session
+                currentSessionId = sessionId;
+                
+                // Update UI
+                const session = sessions.find(s => s.id === sessionId);
+                document.getElementById('sessionTitle').textContent = session.title;
+                document.getElementById('sessionSubtitle').textContent = `Sessie geladen - ${session.date}`;
+                
+                // Render conversation history
+                if (sessionData.conversation_history) {
+                    sessionData.conversation_history.forEach(msg => {
+                        if (msg.role === 'user') {
+                            addMessage(msg.content, 'user');
+                        } else if (msg.role === 'assistant') {
+                            addMessage(msg.content, 'agent');
+                        }
+                    });
+                }
+                
+                // Update progress (estimate based on messages)
+                const progress = Math.min(100, (sessionData.conversation_history?.length || 0) * 5);
+                updateProgress(progress, sessionData.status === 'completed' ? 11 : 1, 'Geladen');
+                
+                // Reconnect WebSocket if not completed
+                if (sessionData.status !== 'completed') {
+                    ws = new WebSocket(`ws://localhost:8000/ws/interview/${sessionId}`);
+                    
+                    ws.onopen = () => {
+                        console.log('WebSocket reconnected');
+                    };
+
+                    ws.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        
+                        if (data.type === 'agent_message') {
+                            addMessage(data.content, 'agent');
+                            updateProgress(data.progress, data.fase, data.fase_name);
+                            
+                            // Generate AI suggestions (with small delay)
+                            setTimeout(() => generateSuggestions(data.content), 300);
+                        } else if (data.type === 'error') {
+                            addMessage('Sorry, er ging iets mis: ' + data.message, 'system');
+                        } else if (data.type === 'interview_complete') {
+                            addMessage(data.message, 'system');
+                            updateProgress(100, 11, 'Voltooid');
+                            hideSuggestions();
+                        }
+                    };
+
+                    ws.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                    };
+
+                    ws.onclose = () => {
+                        console.log('WebSocket closed');
+                    };
+                } else {
+                    addMessage('Dit interview is voltooid. Start een nieuw interview om verder te gaan.', 'system');
+                }
+                
+                renderSessions();
+            } catch (error) {
+                console.error('Error loading session:', error);
+                await showModal(
+                    'Fout bij Laden',
+                    'Er is een fout opgetreden bij het laden van de sessie: ' + error.message,
+                    'error',
+                    [{ label: 'OK', value: true, primary: true }]
+                );
+            }
+        }
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message || !ws) return;
+
+            // Add user message to UI
+            addMessage(message, 'user');
+            
+            // Update conversation context
+            updateContext(message);
+
+            // Update session title with first message
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (session && session.messageCount === 0) {
+                // Use first 50 chars of message as title
+                session.title = message.length > 50 ? message.substring(0, 50) + '...' : message;
+                session.messageCount++;
+                saveSessions();
+                renderSessions();
+            }
+
+            // Send to server
+            ws.send(JSON.stringify({
+                type: 'user_message',
+                content: message
+            }));
+
+            // Clear input
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Hide suggestions after sending
+            hideSuggestions();
+            
+            // Disable button temporarily
+            const button = document.getElementById('sendButton');
+            button.disabled = true;
+            setTimeout(() => button.disabled = false, 1000);
+        }
+
+        // Handle input keydown
+        function handleInputKeydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Auto resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 128) + 'px';
+        }
+
+        // Add message
+        function addMessage(content, type) {
+            // Add to message history for back navigation
+            if (type !== 'system') {
+                messageHistory.push({ role: type, content: content });
+                updateBackButtonVisibility();
+            }
+            
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-enter';
+            
+            if (type === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex justify-end">
+                        <div class="max-w-[80%] bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-3 rounded-2xl rounded-br-md shadow-md">
+                            <div class="text-sm leading-relaxed">${escapeHtml(content)}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'agent') {
+                messageDiv.innerHTML = `
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 bg-white border border-gray-200 px-5 py-3 rounded-2xl rounded-tl-md shadow-sm">
+                            <div class="text-sm leading-relaxed text-gray-800">${formatMessage(content)}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'system') {
+                messageDiv.innerHTML = `
+                    <div class="flex justify-center">
+                        <div class="bg-blue-50 border border-blue-200 text-blue-800 px-5 py-3 rounded-xl text-sm text-center shadow-sm">
+                            ${escapeHtml(content)}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(messageDiv);
+            container.parentElement.scrollTop = container.parentElement.scrollHeight;
+        }
+
+        // Update progress
+        function updateProgress(progress, fase, faseName) {
+            document.getElementById('progressBarTop').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+            document.getElementById('sessionSubtitle').textContent = `Fase ${fase}/11: ${faseName}`;
+        }
+
+        // Format message
+        function formatMessage(content) {
+            let formatted = content;
+            
+            // Remove JSON blocks
+            formatted = formatted.replace(/```json[\s\S]*?```/g, '');
+            
+            // Remove JSON lines
+            let lines = formatted.split('\n');
+            let inJson = false;
+            let filteredLines = [];
+            
+            for (let line of lines) {
+                if (line.trim().startsWith('{') || line.trim().startsWith('"')) {
+                    inJson = true;
+                }
+                
+                if (!inJson) {
+                    filteredLines.push(line);
+                }
+                
+                if (line.trim().endsWith('}')) {
+                    inJson = false;
+                }
+            }
+            
+            formatted = filteredLines.join('\n');
+            
+            // Convert **bold** to <strong>
+            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>');
+            
+            // Convert bullet points
+            formatted = formatted.replace(/^- (.+)$/gm, '<div class="ml-4">• $1</div>');
+            
+            // Convert newlines to <br>
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Clean up multiple <br> tags
+            formatted = formatted.replace(/(<br>\s*){3,}/g, '<br><br>');
+            
+            return formatted;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        initDarkMode();
+        loadSessions();
+    </script>
+</body>
+</html>
