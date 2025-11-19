@@ -476,7 +476,7 @@
                 const validSessions = [];
                 for (const session of sessions) {
                     try {
-                        const response = await fetch(`http://localhost:8000/api/session/${session.id}`);
+                        const response = await fetch(`${API_BASE}/api/session/${session.id}`);
                         if (response.ok) {
                             validSessions.push(session);
                         }
@@ -733,7 +733,7 @@
                 await new Promise(resolve => setTimeout(resolve, 100));
                 
                 // Fetch session data
-                const response = await fetch(`http://localhost:8000/api/session/${sessionId}/export`);
+                const response = await fetch(`${API_BASE}/api/session/${sessionId}/export`);
                 if (!response.ok) {
                     throw new Error('Sessie niet gevonden');
                 }
@@ -1001,7 +1001,7 @@
             
             // Fetch AI-generated suggestions from API
             try {
-                const response = await fetch(`http://localhost:8000/api/session/${currentSessionId}/suggestions`, {
+                const response = await fetch(`${API_BASE}/api/session/${currentSessionId}/suggestions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1218,13 +1218,16 @@
             }
         }
 
+        // API Base URL - auto-detect
+        const API_BASE = window.location.origin;
+        
         // Show template selector
         async function showTemplateSelector() {
             const modal = document.getElementById('templateModal');
             const templateOptions = document.getElementById('templateOptions');
             
             // Fetch templates from API
-            const response = await fetch('http://localhost:8000/api/templates');
+            const response = await fetch(`${API_BASE}/api/templates`);
             const data = await response.json();
             const templates = data.templates;
             
@@ -1268,7 +1271,7 @@
             document.getElementById('interviewControls').classList.remove('hidden');
 
             // Create session with selected template
-            const response = await fetch('http://localhost:8000/api/session/start', {
+            const response = await fetch(`${API_BASE}/api/session/start`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1300,15 +1303,24 @@
             document.getElementById('sessionTitle').textContent = `${template.name} in uitvoering`;
             document.getElementById('sessionSubtitle').textContent = `Fase 1/${template.total_fases}: Intro & context`;
 
-            // Connect WebSocket
-            ws = new WebSocket(`ws://localhost:8000/ws/interview/${currentSessionId}`);
-            
-            ws.onopen = () => {
-                console.log('WebSocket connected');
-            };
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
+            // Send initial message to get first question (REST API instead of WebSocket)
+            await sendInitialMessage();
+        }
+        
+        // Send initial message to start interview
+        async function sendInitialMessage() {
+            try {
+                const response = await fetch(`${API_BASE}/api/session/${currentSessionId}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: 'start'
+                    })
+                });
+                
+                const data = await response.json();
                 
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
@@ -1318,35 +1330,29 @@
                     setTimeout(() => generateSuggestions(data.content), 300);
                 } else if (data.type === 'error') {
                     addMessage('Sorry, er ging iets mis: ' + data.message, 'system');
-                } else if (data.type === 'interview_complete') {
-                    addMessage(data.message, 'system');
-                    updateProgress(100, 11, 'Voltooid');
+                } else if (data.interview_complete) {
+                    addMessage('Interview voltooid! Je kunt de resultaten nu exporteren.', 'system');
+                    updateProgress(100, currentTotalFases, 'Voltooid');
                     hideSuggestions();
                 }
-            };
-
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
+            } catch (error) {
+                console.error('Error sending initial message:', error);
                 addMessage('Verbindingsfout. Probeer de pagina te verversen.', 'system');
-            };
-
-            ws.onclose = () => {
-                console.log('WebSocket closed');
-            };
+            }
         }
 
         // Load existing session
         async function loadSession(sessionId) {
             try {
                 // Fetch session info first to get template data
-                const infoResponse = await fetch(`http://localhost:8000/api/session/${sessionId}`);
+                const infoResponse = await fetch(`${API_BASE}/api/session/${sessionId}`);
                 if (infoResponse.ok) {
                     const sessionInfo = await infoResponse.json();
                     currentTotalFases = sessionInfo.total_fases || 11;
                 }
                 
                 // Fetch session data from backend
-                const response = await fetch(`http://localhost:8000/api/session/${sessionId}/export`);
+                const response = await fetch(`${API_BASE}/api/session/${sessionId}/export`);
                 if (!response.ok) {
                     await showModal(
                         'Sessie Niet Gevonden',
@@ -1391,40 +1397,8 @@
                 const progress = Math.min(100, (sessionData.conversation_history?.length || 0) * 5);
                 updateProgress(progress, sessionData.status === 'completed' ? currentTotalFases : 1, 'Geladen');
                 
-                // Reconnect WebSocket if not completed
-                if (sessionData.status !== 'completed') {
-                    ws = new WebSocket(`ws://localhost:8000/ws/interview/${sessionId}`);
-                    
-                    ws.onopen = () => {
-                        console.log('WebSocket reconnected');
-                    };
-
-                    ws.onmessage = (event) => {
-                        const data = JSON.parse(event.data);
-                        
-                        if (data.type === 'agent_message') {
-                            addMessage(data.content, 'agent');
-                            updateProgress(data.progress, data.fase, data.fase_name);
-                            
-                            // Generate AI suggestions (with small delay)
-                            setTimeout(() => generateSuggestions(data.content), 300);
-                        } else if (data.type === 'error') {
-                            addMessage('Sorry, er ging iets mis: ' + data.message, 'system');
-                        } else if (data.type === 'interview_complete') {
-                            addMessage(data.message, 'system');
-                            updateProgress(100, 11, 'Voltooid');
-                            hideSuggestions();
-                        }
-                    };
-
-                    ws.onerror = (error) => {
-                        console.error('WebSocket error:', error);
-                    };
-
-                    ws.onclose = () => {
-                        console.log('WebSocket closed');
-                    };
-                } else {
+                // Check if interview is completed
+                if (sessionData.status === 'completed') {
                     addMessage('Dit interview is voltooid. Start een nieuw interview om verder te gaan.', 'system');
                 }
                 
@@ -1441,11 +1415,11 @@
         }
 
         // Send message
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('userInput');
             const message = input.value.trim();
             
-            if (!message || !ws) return;
+            if (!message || !currentSessionId) return;
 
             // Add user message to UI
             addMessage(message, 'user');
@@ -1463,12 +1437,6 @@
                 renderSessions();
             }
 
-            // Send to server
-            ws.send(JSON.stringify({
-                type: 'user_message',
-                content: message
-            }));
-
             // Clear input
             input.value = '';
             input.style.height = 'auto';
@@ -1479,7 +1447,40 @@
             // Disable button temporarily
             const button = document.getElementById('sendButton');
             button.disabled = true;
-            setTimeout(() => button.disabled = false, 1000);
+
+            try {
+                // Send to server via REST API
+                const response = await fetch(`${API_BASE}/api/session/${currentSessionId}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.type === 'agent_message') {
+                    addMessage(data.content, 'agent');
+                    updateProgress(data.progress, data.fase, data.fase_name);
+                    
+                    // Generate AI suggestions based on the question (with small delay)
+                    setTimeout(() => generateSuggestions(data.content), 300);
+                } else if (data.type === 'error') {
+                    addMessage('Sorry, er ging iets mis: ' + data.message, 'system');
+                } else if (data.interview_complete) {
+                    addMessage('Interview voltooid! Je kunt de resultaten nu exporteren.', 'system');
+                    updateProgress(100, currentTotalFases, 'Voltooid');
+                    hideSuggestions();
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                addMessage('Verbindingsfout. Probeer opnieuw.', 'system');
+            } finally {
+                button.disabled = false;
+            }
         }
 
         // Handle input keydown
