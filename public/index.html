@@ -1005,6 +1005,9 @@
                 return;
             }
             
+            // Show loading state for suggestions
+            showSuggestionsLoading();
+            
             // Generate context-aware suggestions using Claude
             try {
                 const response = await fetch(`${API_BASE}/api/suggestions`, {
@@ -1038,6 +1041,25 @@
             ];
             
             showSuggestions(fallbackSuggestions);
+        }
+        
+        function showSuggestionsLoading() {
+            const container = document.getElementById('aiSuggestions');
+            const chipsContainer = document.getElementById('suggestionChips');
+            
+            // Show loading state
+            chipsContainer.innerHTML = `
+                <div class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-blue-50 text-gray-500 rounded-full text-sm border border-purple-200">
+                    <div class="flex gap-1">
+                        <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                        <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                        <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                    </div>
+                    <span class="text-xs">AI genereert suggesties...</span>
+                </div>
+            `;
+            
+            container.classList.remove('hidden');
         }
         
         function showSuggestions(suggestions) {
