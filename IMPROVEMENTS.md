@@ -175,11 +175,17 @@
 
 ## 📱 MOBILE RESPONSIVENESS
 
-### ⬜ 23. Sidebar overlay op mobile
-**Impact**: 8/10 | **Tijd**: 3 uur  
+### ✅ 23. Sidebar overlay op mobile
+**Impact**: 8/10 | **Tijd**: 3 uur | **Voltooid**: 19 nov 2025  
 **Probleem**: Sidebar neemt te veel ruimte op mobile  
 **Oplossing**: Hamburger menu op mobile, slide-in sidebar  
-**Verwachte verbetering**: Betere mobile UX
+**Verwachte verbetering**: Betere mobile UX  
+**Implementatie**:
+- Mobile header met hamburger menu (alleen zichtbaar op <768px)
+- Sidebar slide-in van links met smooth transition
+- Dark backdrop overlay bij open sidebar
+- Auto-close bij sessie selectie
+- Body scroll prevention bij open sidebar
 
 ### ⬜ 24. Touch targets te klein
 **Impact**: 7/10 | **Tijd**: 2 uur  
@@ -219,12 +225,13 @@ Prioriteer deze voor maximale impact met minimale tijd:
 ## 📊 VOORTGANG TRACKING
 
 **Totaal taken**: 24  
-**Voltooid**: 0  
+**Voltooid**: 1 ✅  
 **In progress**: 0  
-**Te doen**: 24  
+**Te doen**: 23  
 
 **Geschatte totale tijd**: ~60 uur  
-**Quick wins tijd**: ~5 uur
+**Quick wins tijd**: ~5 uur  
+**Bestede tijd**: 3 uur
 
 ---
 
