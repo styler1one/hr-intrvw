@@ -28,6 +28,10 @@ class handler(BaseHTTPRequestHandler):
             # Load sessions from file
             sessions = load_sessions()
             
+            print(f"Looking for session: {session_id}")
+            print(f"Available sessions: {list(sessions.keys())}")
+            print(f"Total sessions: {len(sessions)}")
+            
             if not session_id or session_id not in sessions:
                 self.send_error(404, "Session not found")
                 return

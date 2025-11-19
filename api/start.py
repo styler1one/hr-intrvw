@@ -50,6 +50,9 @@ class handler(BaseHTTPRequestHandler):
             sessions[session_id] = session
             save_sessions(sessions)
             
+            print(f"Session created: {session_id}")
+            print(f"Total sessions: {len(sessions)}")
+            
             # Send response
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
