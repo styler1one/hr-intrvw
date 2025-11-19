@@ -1653,10 +1653,28 @@
             container.parentElement.scrollTop = container.parentElement.scrollHeight;
         }
 
-        // Update progress
+        // Update progress based on conversation depth
         function updateProgress(progress, fase, faseName) {
-            document.getElementById('progressBarTop').style.width = progress + '%';
-            document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+            // Calculate progress based on number of user messages
+            let calculatedProgress = 0;
+            if (currentSession && currentSession.messages) {
+                // Count user messages (excluding the initial 'start')
+                const userMessages = currentSession.messages.filter(m => m.role === 'user' && m.content !== 'start').length;
+                
+                // Fase 1 has ~8 questions, so estimate progress within fase
+                const questionsPerFase = 8;
+                const faseProgress = Math.min((userMessages / questionsPerFase) * 100, 100);
+                
+                // Overall progress: weight current fase progress
+                const faseWeight = 100 / currentTotalFases;
+                calculatedProgress = ((fase - 1) * faseWeight) + (faseProgress * faseWeight / 100);
+                calculatedProgress = Math.min(calculatedProgress, 95); // Cap at 95% until complete
+            } else {
+                calculatedProgress = progress;
+            }
+            
+            document.getElementById('progressBarTop').style.width = calculatedProgress + '%';
+            document.getElementById('progressPercent').textContent = Math.round(calculatedProgress) + '%';
             document.getElementById('sessionSubtitle').textContent = `Fase ${fase}/${currentTotalFases}: ${faseName}`;
         }
 
