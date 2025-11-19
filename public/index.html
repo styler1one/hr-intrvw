@@ -292,7 +292,7 @@
                             </div>
                         </div>
 
-                        <button onclick="startNewInterview()" class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <button onclick="showTemplateSelector()" class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                             <span>Start Interview</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
@@ -372,6 +372,20 @@
         </div>
     </div>
 
+    <!-- Template Selector Modal -->
+    <div id="templateModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 transform transition-all">
+            <div class="p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Kies je Interview Template</h2>
+                <p class="text-gray-600 mb-6">Selecteer het type interview dat het beste bij je situatie past</p>
+                
+                <div id="templateOptions" class="space-y-4">
+                    <!-- Templates will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let sessions = [];
         let currentSessionId = null;
@@ -386,6 +400,7 @@
             hasSystem: null
         };  // Track conversation context for better suggestions
         let modalResolve = null;
+        let currentTotalFases = 11;  // Track total fases for current template
 
         // Custom Modal Functions
         function showModal(title, message, type = 'info', buttons = []) {
@@ -1194,17 +1209,52 @@
                     document.getElementById('chatMessages').innerHTML = '';
                     currentSessionId = null;
                     
-                    // Start new interview
-                    startNewInterview();
+                    // Show template selector
+                    showTemplateSelector();
                 }
             } else {
-                // No active session, just start new
-                startNewInterview();
+                // No active session, show template selector
+                showTemplateSelector();
             }
         }
 
-        // Start new interview
-        async function startNewInterview() {
+        // Show template selector
+        async function showTemplateSelector() {
+            const modal = document.getElementById('templateModal');
+            const templateOptions = document.getElementById('templateOptions');
+            
+            // Fetch templates from API
+            const response = await fetch('http://localhost:8000/api/templates');
+            const data = await response.json();
+            const templates = data.templates;
+            
+            // Render template options
+            templateOptions.innerHTML = Object.values(templates).map(template => `
+                <div onclick="selectTemplate('${template.id}')" class="border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 group">
+                    <div class="flex items-start gap-4">
+                        <div class="text-4xl">${template.icon}</div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-purple-600">${template.name}</h3>
+                            <p class="text-sm text-gray-600 mt-1">${template.description}</p>
+                            <div class="flex gap-4 mt-3 text-sm text-gray-500">
+                                <span>⏱️ ${template.duration}</span>
+                                <span>📊 ${template.total_fases} fases</span>
+                                <span>❓ ${template.questions_per_fase} vragen/fase</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 italic">${template.use_case}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            modal.classList.remove('hidden');
+        }
+        
+        // Select template and start interview
+        async function selectTemplate(templateId) {
+            // Hide template modal
+            document.getElementById('templateModal').classList.add('hidden');
+            
             // Reset state
             messageHistory = [];
             isPaused = false;
@@ -1217,12 +1267,22 @@
             document.getElementById('progressIndicator').classList.remove('hidden');
             document.getElementById('interviewControls').classList.remove('hidden');
 
-            // Create session
+            // Create session with selected template
             const response = await fetch('http://localhost:8000/api/session/start', {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    template_id: templateId
+                })
             });
             const data = await response.json();
             currentSessionId = data.session_id;
+            const template = data.template;
+            
+            // Set current total fases for progress tracking
+            currentTotalFases = template.total_fases;
 
             // Add to sessions list (title will be updated after first message)
             const newSession = {
@@ -1237,8 +1297,8 @@
             renderSessions();
 
             // Update UI
-            document.getElementById('sessionTitle').textContent = 'Interview in uitvoering';
-            document.getElementById('sessionSubtitle').textContent = 'Fase 1/11: Intro & context';
+            document.getElementById('sessionTitle').textContent = `${template.name} in uitvoering`;
+            document.getElementById('sessionSubtitle').textContent = `Fase 1/${template.total_fases}: Intro & context`;
 
             // Connect WebSocket
             ws = new WebSocket(`ws://localhost:8000/ws/interview/${currentSessionId}`);
@@ -1278,6 +1338,13 @@
         // Load existing session
         async function loadSession(sessionId) {
             try {
+                // Fetch session info first to get template data
+                const infoResponse = await fetch(`http://localhost:8000/api/session/${sessionId}`);
+                if (infoResponse.ok) {
+                    const sessionInfo = await infoResponse.json();
+                    currentTotalFases = sessionInfo.total_fases || 11;
+                }
+                
                 // Fetch session data from backend
                 const response = await fetch(`http://localhost:8000/api/session/${sessionId}/export`);
                 if (!response.ok) {
@@ -1322,7 +1389,7 @@
                 
                 // Update progress (estimate based on messages)
                 const progress = Math.min(100, (sessionData.conversation_history?.length || 0) * 5);
-                updateProgress(progress, sessionData.status === 'completed' ? 11 : 1, 'Geladen');
+                updateProgress(progress, sessionData.status === 'completed' ? currentTotalFases : 1, 'Geladen');
                 
                 // Reconnect WebSocket if not completed
                 if (sessionData.status !== 'completed') {
@@ -1480,7 +1547,7 @@
         function updateProgress(progress, fase, faseName) {
             document.getElementById('progressBarTop').style.width = progress + '%';
             document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
-            document.getElementById('sessionSubtitle').textContent = `Fase ${fase}/11: ${faseName}`;
+            document.getElementById('sessionSubtitle').textContent = `Fase ${fase}/${currentTotalFases}: ${faseName}`;
         }
 
         // Format message

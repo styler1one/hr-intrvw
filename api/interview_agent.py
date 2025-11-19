@@ -3,11 +3,15 @@ import anthropic
 import json
 import re
 from pathlib import Path
+from templates import get_template, get_fase_count, EXTENDED_FASE_INSTRUCTIONS
 
 class InterviewAgent:
-    def __init__(self, provider: str = "openai", api_key: str = None, model: str = "gpt-4-turbo", api_base: str = None):
+    def __init__(self, provider: str = "openai", api_key: str = None, model: str = "gpt-4-turbo", api_base: str = None, template_id: str = "standard"):
         self.provider = provider.lower()
         self.model = model
+        self.template_id = template_id
+        self.template = get_template(template_id)
+        self.total_fases = self.template["total_fases"]
         
         # Initialize the appropriate client
         if self.provider == "openai":
@@ -75,11 +79,12 @@ After each fase, output JSON in this format:
 ```"""
     
     def load_fase_instructions(self):
-        """Load fase-specific instructions"""
-        return {
+        """Load fase-specific instructions based on template"""
+        # Base instructions for fases 1-11
+        base_instructions = {
             1: {
                 "name": "Intro & context",
-                "duration": "5 min",
+                "duration": "5 min" if self.template_id != "quick" else "3 min",
                 "instructions": """FASE 1 – INTRO & CONTEXT
 
 BELANGRIJK: Stel vragen ÉÉN VOOR ÉÉN. Wacht op antwoord voordat je de volgende vraag stelt.
@@ -105,7 +110,7 @@ Als bevestigd, output JSON met:
             },
             2: {
                 "name": "Stakeholders",
-                "duration": "5 min",
+                "duration": "5 min" if self.template_id != "quick" else "3 min",
                 "instructions": """FASE 2 – STAKEHOLDERS
 
 BELANGRIJK: Stel vragen ÉÉN VOOR ÉÉN. Wacht op antwoord voordat je de volgende vraag stelt.
@@ -127,6 +132,12 @@ Als bevestigd, output JSON met:
             },
             # Add more fases as needed
         }
+        
+        # Add extended fases for extensive template
+        if self.template_id == "extensive":
+            base_instructions.update(EXTENDED_FASE_INSTRUCTIONS)
+        
+        return base_instructions
     
     async def process_message(self, messages: list, current_fase: int):
         """Process user message and generate response"""
