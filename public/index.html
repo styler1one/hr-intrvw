@@ -389,6 +389,7 @@
     <script>
         let sessions = [];
         let currentSessionId = null;
+        let currentSession = null;  // Store full session data
         let ws = null;
         let isPaused = false;
         let messageHistory = [];  // Track all messages for back navigation
@@ -1284,6 +1285,17 @@
             currentSessionId = data.session_id;
             const template = data.template;
             
+            // Initialize session data
+            currentSession = {
+                session_id: currentSessionId,
+                template_id: templateId,
+                template_name: template.name,
+                total_fases: template.total_fases,
+                current_fase: 1,
+                messages: [],
+                created_at: new Date().toISOString()
+            };
+            
             // Set current total fases for progress tracking
             currentTotalFases = template.total_fases;
 
@@ -1310,13 +1322,14 @@
         // Send initial message to start interview
         async function sendInitialMessage() {
             try {
-                const response = await fetch(`${API_BASE}/api/chat?session_id=${currentSessionId}`, {
+                const response = await fetch(`${API_BASE}/api/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        content: 'start'
+                        content: 'start',
+                        session: currentSession
                     })
                 });
                 
@@ -1329,6 +1342,11 @@
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
                     updateProgress(data.progress, data.fase, data.fase_name);
+                    
+                    // Update session with response
+                    if (data.session) {
+                        currentSession = data.session;
+                    }
                     
                     // Generate AI suggestions based on the question (with small delay)
                     setTimeout(() => generateSuggestions(data.content), 300);
@@ -1454,14 +1472,15 @@
             button.disabled = true;
 
             try {
-                // Send to server via REST API
-                const response = await fetch(`${API_BASE}/api/chat?session_id=${currentSessionId}`, {
+                // Send to server via REST API with session data
+                const response = await fetch(`${API_BASE}/api/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        content: message
+                        content: message,
+                        session: currentSession
                     })
                 });
                 
@@ -1470,6 +1489,11 @@
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
                     updateProgress(data.progress, data.fase, data.fase_name);
+                    
+                    // Update session with response
+                    if (data.session) {
+                        currentSession = data.session;
+                    }
                     
                     // Generate AI suggestions based on the question (with small delay)
                     setTimeout(() => generateSuggestions(data.content), 300);
