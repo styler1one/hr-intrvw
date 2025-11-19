@@ -47,15 +47,15 @@ class handler(BaseHTTPRequestHandler):
             try:
                 # Check if this is the first message (start)
                 if message_content.lower() == 'start':
-                    ai_message = """Welkom! Ik ben de Volentis HR Implementation Interview Agent.
+                    ai_message = """Hallo! Fijn dat je er bent. 👋
 
-Ik ga je helpen om:
-✅ Een compleet implementatieplan voor de Volentis HR Agent te maken
-✅ Een HR-verbeter-roadmap op te stellen
+Ik ga je helpen om de Volentis HR Agent succesvol te implementeren in jouw organisatie. We gaan samen alle belangrijke informatie doornemen, zodat we een implementatiestrategie op maat kunnen maken.
 
-Laten we beginnen!
+Dit gesprek duurt ongeveer 45 minuten en je kunt altijd pauzeren als dat nodig is.
 
-**Vraag 1:** In wat voor organisatie werk je? (sector, grootte, landen)"""
+**Laten we beginnen met jouw organisatie:**
+
+Kun je me vertellen in wat voor organisatie je werkt? Denk aan de sector, de grootte (aantal medewerkers) en in welke landen jullie actief zijn."""
                 else:
                     # Use Anthropic Claude
                     from anthropic import Anthropic
