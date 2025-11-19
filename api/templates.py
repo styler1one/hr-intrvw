@@ -4,11 +4,14 @@ GET /api/templates - Return all interview templates
 from http.server import BaseHTTPRequestHandler
 import json
 
-# Import from config
-import sys
-import os
-sys.path.insert(0, os.path.dirname(__file__))
-from _config import INTERVIEW_TEMPLATES
+# Import from config - use relative import for Vercel
+try:
+    from ._config import INTERVIEW_TEMPLATES
+except ImportError:
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(__file__))
+    from _config import INTERVIEW_TEMPLATES
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):

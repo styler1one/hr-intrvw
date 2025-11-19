@@ -8,10 +8,13 @@ import os
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 
-# Import from config
-import sys
-sys.path.insert(0, os.path.dirname(__file__))
-from _config import SESSIONS, get_template
+# Import from config - use relative import for Vercel
+try:
+    from ._config import SESSIONS, get_template
+except ImportError:
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    from _config import SESSIONS, get_template
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
