@@ -58,13 +58,14 @@ Laten we beginnen!
 **Vraag 1:** In wat voor organisatie werk je? (sector, grootte, landen)"""
                 else:
                     # Use Anthropic Claude
-                    import anthropic
+                    from anthropic import Anthropic
                     
                     api_key = os.getenv("ANTHROPIC_API_KEY")
                     if not api_key:
                         raise Exception("ANTHROPIC_API_KEY not configured in Vercel environment variables")
                     
-                    client = anthropic.Anthropic(api_key=api_key)
+                    # Initialize client with minimal parameters
+                    client = Anthropic(api_key=api_key)
                     
                     # Simple system prompt
                     system_prompt = """Je bent de Volentis HR Implementation Interview Agent.
