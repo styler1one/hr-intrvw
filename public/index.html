@@ -280,11 +280,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
-                    <h1 class="text-lg font-semibold text-gray-900">Volentis Interview Agent</h1>
+                    <div class="flex-1 min-w-0">
+                        <h1 id="mobileSessionTitle" class="text-base font-semibold text-gray-900 truncate">Volentis Interview Agent</h1>
+                    </div>
                 </div>
                 
-                <!-- Top Bar -->
-                <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4">
+                <!-- Top Bar (Desktop only) -->
+                <div class="hidden md:flex bg-white border-b border-gray-200 px-4 py-3 items-center gap-4">
                     <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -816,7 +818,7 @@
                 
                 // Update title if this is the current session
                 if (sessionId === currentSessionId) {
-                    document.getElementById('sessionTitle').textContent = newName;
+                    updateSessionTitle(newName);
                 }
             }
             
@@ -1091,8 +1093,7 @@
                     document.getElementById('progressIndicator').classList.add('hidden');
                     
                     // Reset title
-                    document.getElementById('sessionTitle').textContent = 'Volentis Interview Agent';
-                    document.getElementById('sessionSubtitle').textContent = 'Start een nieuw interview om te beginnen';
+                    updateSessionTitle('Volentis Interview Agent', 'Start een nieuw interview om te beginnen');
                     
                     currentSessionId = null;
                 }
@@ -1381,6 +1382,21 @@
             updateDarkModeUI(isDarkMode);
         }
         
+        // Helper function to update session title in both mobile and desktop headers
+        function updateSessionTitle(title, subtitle = '') {
+            // Update desktop header
+            document.getElementById('sessionTitle').textContent = title;
+            if (subtitle) {
+                document.getElementById('sessionSubtitle').textContent = subtitle;
+            }
+            
+            // Update mobile header
+            const mobileTitle = document.getElementById('mobileSessionTitle');
+            if (mobileTitle) {
+                mobileTitle.textContent = title;
+            }
+        }
+        
         // Mobile sidebar functions
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -1568,8 +1584,7 @@
             showToast('Interview gestart!', 'success');
 
             // Update UI
-            document.getElementById('sessionTitle').textContent = `${template.name} in uitvoering`;
-            document.getElementById('sessionSubtitle').textContent = `Fase 1/${template.total_fases}: Intro & context`;
+            updateSessionTitle(`${template.name} in uitvoering`, `Fase 1/${template.total_fases}: Intro & context`);
 
             // Send initial message to get first question (REST API instead of WebSocket)
             await sendInitialMessage();
@@ -1665,8 +1680,7 @@
                 
                 // Update UI
                 const session = sessions.find(s => s.id === sessionId);
-                document.getElementById('sessionTitle').textContent = session.title;
-                document.getElementById('sessionSubtitle').textContent = `Sessie geladen - ${session.date}`;
+                updateSessionTitle(session.title, `Sessie geladen - ${session.date}`);
                 
                 // Render conversation history
                 if (sessionData.conversation_history) {
