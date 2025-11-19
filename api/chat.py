@@ -5,6 +5,7 @@ URL format: /api/chat?session_id=xxx
 from http.server import BaseHTTPRequestHandler
 import json
 import os
+import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 
@@ -94,9 +95,26 @@ Kun je me vertellen in wat voor organisatie je werkt? Denk aan de sector, de gro
    - NEVER invent data - mark as "unknown" if unclear
    - ASK follow-up questions max 2x per topic, then move on
 
-3. QUESTION CLUSTERING:
+3. OUTPUT STRUCTURE:
+   - Generate PARTIAL JSON after each fase
+   - Each fase outputs only its own fields
+
+4. QUESTION CLUSTERING:
    - Group questions in clusters of max 3-4 per interaction
-   - Wait for answers before next cluster"""
+   - Wait for answers before next cluster
+
+=== OUTPUT FORMAT ===
+After each fase, output JSON in this format:
+```json
+{
+  "fase": number,
+  "fase_name": "string",
+  "confidence": "high | medium | low",
+  "fields": {
+    // only fields relevant to this fase
+  }
+}
+```"""
                     
                     # Add fase-specific instructions
                     fase_instructions = {
@@ -114,7 +132,16 @@ VRAGEN (stel ze één voor één):
 5. Wat is de HR-strategie voor de komende 2-3 jaar?
 6. Hoe zou je de organisatiecultuur beschrijven?
 7. Hoe is de werkdruk binnen HR?
-8. Zijn er recente reorganisaties of grote veranderingen geweest?""",
+8. Zijn er recente reorganisaties of grote veranderingen geweest?
+
+FASE AFSLUITING:
+Na alle vragen: geef korte samenvatting (max 5 bullets) en vraag: "Klopt dit?"
+
+Als bevestigd, output JSON met:
+- org_profile
+- hr_team_profile
+- strategic_focus
+- organizational_culture""",
                         2: """
 
 FASE 2 – STAKEHOLDERS
@@ -126,7 +153,15 @@ VRAGEN (stel ze één voor één):
 2. Wie moet uiteindelijk akkoord geven op de implementatie?
 3. Zijn er groepen waar je weerstand verwacht? Waarom?
 4. Hoe staat jullie organisatie over het algemeen tegenover nieuwe technologie?
-5. Wat was de laatste grote HR-verandering en hoe verliep die?"""
+5. Wat was de laatste grote HR-verandering en hoe verliep die?
+
+FASE AFSLUITING:
+Na alle vragen: geef korte samenvatting (max 5 bullets) en vraag: "Klopt dit?"
+
+Als bevestigd, output JSON met:
+- stakeholders
+- change_history
+- change_readiness_preliminary"""
                     }
                     
                     # Add fase instructions if available
@@ -134,8 +169,10 @@ VRAGEN (stel ze één voor één):
                         system_prompt += fase_instructions[current_fase]
                     
                     # Build messages for Claude (no system in messages array)
+                    # Use last 10 messages to manage context window
                     messages = []
-                    for msg in session["messages"]:
+                    recent_messages = session["messages"][-10:] if len(session["messages"]) > 10 else session["messages"]
+                    for msg in recent_messages:
                         if msg["role"] != "system":
                             messages.append({
                                 "role": msg["role"],
@@ -151,6 +188,20 @@ VRAGEN (stel ze één voor één):
                     )
                     
                     ai_message = response.content[0].text
+                
+                # Check for JSON output (fase complete)
+                partial_json = self.extract_json(ai_message)
+                fase_complete = partial_json is not None
+                
+                # If fase complete, increment fase counter
+                if fase_complete:
+                    session["current_fase"] = session.get("current_fase", 1) + 1
+                    # Store fase data
+                    if "fase_data" not in session:
+                        session["fase_data"] = {}
+                    if partial_json:
+                        fase_num = partial_json.get("fase", current_fase)
+                        session["fase_data"][f"fase_{fase_num}"] = partial_json
                 
                 # Add AI response to session
                 session["messages"].append({
@@ -218,6 +269,30 @@ VRAGEN (stel ze één voor één):
                 "error": str(e),
                 "details": error_details
             }).encode())
+    
+    def extract_json(self, text: str):
+        """Extract JSON from agent response"""
+        # Look for JSON code blocks
+        json_pattern = r'```json\s*(.*?)\s*```'
+        matches = re.findall(json_pattern, text, re.DOTALL)
+        
+        if matches:
+            try:
+                return json.loads(matches[0])
+            except json.JSONDecodeError:
+                pass
+        
+        # Try to find JSON without code blocks
+        try:
+            # Find anything that looks like JSON
+            json_pattern = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
+            matches = re.findall(json_pattern, text, re.DOTALL)
+            if matches:
+                return json.loads(matches[-1])  # Take last match
+        except:
+            pass
+        
+        return None
     
     def do_OPTIONS(self):
         """Handle CORS preflight"""
