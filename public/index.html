@@ -1271,7 +1271,7 @@
             document.getElementById('interviewControls').classList.remove('hidden');
 
             // Create session with selected template
-            const response = await fetch(`${API_BASE}/api/session/start`, {
+            const response = await fetch(`${API_BASE}/api/start`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1310,7 +1310,7 @@
         // Send initial message to start interview
         async function sendInitialMessage() {
             try {
-                const response = await fetch(`${API_BASE}/api/session/${currentSessionId}/chat`, {
+                const response = await fetch(`${API_BASE}/api/chat?session_id=${currentSessionId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1450,7 +1450,7 @@
 
             try {
                 // Send to server via REST API
-                const response = await fetch(`${API_BASE}/api/session/${currentSessionId}/chat`, {
+                const response = await fetch(`${API_BASE}/api/chat?session_id=${currentSessionId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

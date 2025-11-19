@@ -1,144 +1,134 @@
 """
-Chat API endpoint for Vercel deployment (REST-based, no WebSocket)
+POST /api/chat - Send message and get AI response
+URL format: /api/chat?session_id=xxx
 """
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from http.server import BaseHTTPRequestHandler
+import json
 import os
 from datetime import datetime
-from storage import get_storage
-from templates import get_template
+from urllib.parse import urlparse, parse_qs
 
-app = FastAPI()
+# Import from config
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
+from _config import SESSIONS, get_template
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class ChatMessage(BaseModel):
-    content: str
-
-@app.post("/api/session/{session_id}/chat")
-async def chat(session_id: str, message: ChatMessage):
-    """Process a chat message and return agent response"""
-    storage = get_storage()
-    session = storage.get_session(session_id)
-    
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    # Add user message to session
-    session["messages"].append({
-        "role": "user",
-        "content": message.content,
-        "timestamp": datetime.now().isoformat()
-    })
-    
-    # Initialize agent
-    from interview_agent import InterviewAgent
-    
-    provider = os.getenv("LLM_PROVIDER", "openai").lower()
-    if provider == "openai":
-        api_key = os.getenv("OPENAI_API_KEY")
-    elif provider == "anthropic":
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-    else:
-        api_key = os.getenv("OPENAI_API_KEY")
-    
-    agent = InterviewAgent(
-        provider=provider,
-        api_key=api_key,
-        model=os.getenv("LLM_MODEL", "gpt-4-turbo"),
-        template_id=session.get("template_id", "standard")
-    )
-    
-    # Process message
-    try:
-        response = await agent.process_message(
-            messages=session["messages"],
-            current_fase=session["current_fase"]
-        )
-        
-        # Add agent response to session
-        session["messages"].append({
-            "role": "assistant",
-            "content": response["content"],
-            "timestamp": datetime.now().isoformat()
-        })
-        
-        # Check if fase is complete
-        if response.get("fase_complete"):
-            session["partial_data"][f"fase_{session['current_fase']}"] = response["partial_json"]
-            session["current_fase"] += 1
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        """Handle POST request to send chat message"""
+        try:
+            # Parse session_id from URL
+            parsed_url = urlparse(self.path)
+            query_params = parse_qs(parsed_url.query)
+            session_id = query_params.get('session_id', [None])[0]
             
-            total_fases = session.get("total_fases", 11)
-            if session["current_fase"] > total_fases:
-                session["status"] = "completed"
-        
-        # Calculate progress
-        total_fases = session.get("total_fases", 11)
-        progress = (session["current_fase"] / total_fases) * 100
-        
-        # Save session
-        storage.update_session(session_id, session)
-        
-        return {
-            "type": "agent_message",
-            "content": response["content"],
-            "progress": progress,
-            "fase": session["current_fase"],
-            "fase_name": response.get("fase_name", ""),
-            "fase_complete": response.get("fase_complete", False),
-            "interview_complete": session["status"] == "completed"
-        }
-        
-    except Exception as e:
-        print(f"Error processing message: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/session/{session_id}")
-async def get_session(session_id: str):
-    """Get session data"""
-    storage = get_storage()
-    session = storage.get_session(session_id)
+            if not session_id or session_id not in SESSIONS:
+                self.send_error(404, "Session not found")
+                return
+            
+            # Read request body
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            data = json.loads(body.decode('utf-8'))
+            message_content = data.get('content', '')
+            
+            session = SESSIONS[session_id]
+            
+            # Add user message
+            session["messages"].append({
+                "role": "user",
+                "content": message_content,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+            # Get AI response
+            try:
+                import openai
+                
+                api_key = os.getenv("OPENAI_API_KEY")
+                if not api_key:
+                    raise Exception("OPENAI_API_KEY not configured")
+                
+                client = openai.OpenAI(api_key=api_key)
+                
+                # Simple system prompt
+                system_prompt = """Je bent de Volentis HR Implementation Interview Agent.
+Je helpt organisaties om de Volentis HR Agent te implementeren.
+Stel ÉÉN vraag tegelijk. Wees zakelijk en helder."""
+                
+                # Build messages for OpenAI
+                messages = [{"role": "system", "content": system_prompt}]
+                for msg in session["messages"]:
+                    messages.append({"role": msg["role"], "content": msg["content"]})
+                
+                # Call OpenAI
+                response = client.chat.completions.create(
+                    model=os.getenv("LLM_MODEL", "gpt-4-turbo"),
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=500
+                )
+                
+                ai_message = response.choices[0].message.content
+                
+                # Add AI response to session
+                session["messages"].append({
+                    "role": "assistant",
+                    "content": ai_message,
+                    "timestamp": datetime.now().isoformat()
+                })
+                
+                session["updated_at"] = datetime.now().isoformat()
+                
+                # Calculate progress
+                total_fases = session.get("total_fases", 11)
+                current_fase = session.get("current_fase", 1)
+                progress = (current_fase / total_fases) * 100
+                
+                # Send response
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.end_headers()
+                
+                response_data = {
+                    "type": "agent_message",
+                    "content": ai_message,
+                    "progress": progress,
+                    "fase": current_fase,
+                    "fase_name": f"Fase {current_fase}",
+                    "fase_complete": False,
+                    "interview_complete": False
+                }
+                
+                self.wfile.write(json.dumps(response_data).encode())
+                
+            except Exception as e:
+                print(f"OpenAI Error: {e}")
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                error_response = {
+                    "type": "error",
+                    "message": f"AI Error: {str(e)}"
+                }
+                self.wfile.write(json.dumps(error_response).encode())
+                
+        except Exception as e:
+            print(f"Chat Error: {e}")
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": str(e)}).encode())
     
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    total_fases = session.get("total_fases", 11)
-    
-    return {
-        "session_id": session_id,
-        "status": session["status"],
-        "current_fase": session["current_fase"],
-        "progress": (session["current_fase"] / total_fases) * 100,
-        "created_at": session["created_at"],
-        "template_id": session.get("template_id", "standard"),
-        "template_name": session.get("template_name", "Standard Interview"),
-        "total_fases": total_fases
-    }
-
-@app.get("/api/session/{session_id}/export")
-async def export_session(session_id: str):
-    """Export complete session data"""
-    storage = get_storage()
-    session = storage.get_session(session_id)
-    
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    return {
-        "session_id": session_id,
-        "status": session["status"],
-        "created_at": session["created_at"],
-        "conversation_history": session["messages"],
-        "collected_data": session["partial_data"],
-        "template_id": session.get("template_id", "standard"),
-        "template_name": session.get("template_name", "Standard Interview")
-    }
+    def do_OPTIONS(self):
+        """Handle CORS preflight"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
