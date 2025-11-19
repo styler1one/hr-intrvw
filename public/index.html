@@ -789,14 +789,40 @@
                 // Small delay to show modal
                 await new Promise(resolve => setTimeout(resolve, 100));
                 
-                // Fetch session data
-                const response = await fetch(`${API_BASE}/api/session/${sessionId}/export`);
-                if (!response.ok) {
-                    throw new Error('Sessie niet gevonden');
+                // Get session data from local storage or current session
+                const session = sessions.find(s => s.id === sessionId);
+                if (!session) {
+                    throw new Error('Sessie niet gevonden in lokale opslag');
                 }
                 
-                const sessionData = await response.json();
-                const session = sessions.find(s => s.id === sessionId);
+                // Use current session data if this is the active session
+                let sessionData;
+                if (sessionId === currentSessionId && currentSession) {
+                    sessionData = {
+                        conversation_history: currentSession.messages || [],
+                        status: 'in_progress'
+                    };
+                } else {
+                    // Try to fetch from backend, but fallback to empty if not found
+                    try {
+                        const response = await fetch(`${API_BASE}/api/session/${sessionId}/export`);
+                        if (response.ok) {
+                            sessionData = await response.json();
+                        } else {
+                            // Fallback: create from chat messages in DOM
+                            sessionData = {
+                                conversation_history: [],
+                                status: 'completed'
+                            };
+                        }
+                    } catch (error) {
+                        console.log('Could not fetch from backend, using local data');
+                        sessionData = {
+                            conversation_history: [],
+                            status: 'completed'
+                        };
+                    }
+                }
                 
                 // Generate PDF
                 const { jsPDF } = window.jspdf;
@@ -910,10 +936,12 @@
                         yPos += (lines.length * 5) + 8;
                     });
                 } else {
+                    doc.setFillColor(255, 243, 205); // Light yellow
+                    doc.roundedRect(margin, yPos, maxWidth, 20, 2, 2, 'F');
                     doc.setFontSize(10);
-                    doc.setTextColor(150, 150, 150);
-                    doc.text('Geen conversatie geschiedenis beschikbaar.', margin, yPos);
-                    yPos += 10;
+                    doc.setTextColor(120, 80, 0);
+                    doc.text('⚠️ Geen conversatie geschiedenis beschikbaar voor deze sessie.', margin + 5, yPos + 10);
+                    yPos += 25;
                 }
                 
                 // Footer on all pages
