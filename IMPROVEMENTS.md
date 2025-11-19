@@ -8,12 +8,19 @@
 
 ## 🔴 KRITIEKE VERBETERINGEN (Impact: 9-10/10)
 
-### ⬜ 1. Voortgangsbalk blijft op 0-1%
-**Impact**: 10/10 | **Tijd**: 2 uur  
+### ✅ 1. Voortgangsbalk blijft op 0-1%
+**Impact**: 10/10 | **Tijd**: 2 uur | **Voltooid**: 19 nov 2025  
 **Probleem**: Na 3 vragen staat de voortgang nog op 1%, dit geeft gebruikers het gevoel dat het interview eindeloos duurt  
 **Oplossing**: Dynamische voortgang per vraag binnen fase, niet alleen per fase  
 **Code locatie**: `updateProgress()` functie in `public/index.html`  
-**Verwachte verbetering**: Gebruikers voelen progressie en blijven gemotiveerd
+**Verwachte verbetering**: Gebruikers voelen progressie en blijven gemotiveerd  
+**Implementatie**:
+- Per-fase message counter tracking (`faseMessageCount` object)
+- Geschatte 6 vragen per fase voor progressie berekening
+- Base progress van voltooide fases + current fase progress
+- Minimum 3% progress na eerste bericht
+- Console logging voor debugging
+- Progress persistence in session storage
 
 ### ⬜ 2. Geen visuele feedback tijdens AI response
 **Impact**: 9/10 | **Tijd**: 1 uur  
@@ -225,13 +232,13 @@ Prioriteer deze voor maximale impact met minimale tijd:
 ## 📊 VOORTGANG TRACKING
 
 **Totaal taken**: 24  
-**Voltooid**: 1 ✅  
+**Voltooid**: 2 ✅  
 **In progress**: 0  
-**Te doen**: 23  
+**Te doen**: 22  
 
 **Geschatte totale tijd**: ~60 uur  
 **Quick wins tijd**: ~5 uur  
-**Bestede tijd**: 3 uur
+**Bestede tijd**: 5 uur
 
 ---
 
