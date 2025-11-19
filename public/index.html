@@ -1618,13 +1618,6 @@
                 
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
-                    
-                    // Initialize fase message tracking for new session
-                    if (currentSession && !currentSession.faseMessageCount) {
-                        currentSession.faseMessageCount = {};
-                        currentSession.faseMessageCount[1] = 0; // Start at fase 1
-                    }
-                    
                     updateProgress(data.progress, data.fase, data.fase_name);
                     
                     // Update session with response
@@ -1778,16 +1771,6 @@
                 
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
-                    
-                    // Increment message count for current fase
-                    if (currentSession && currentSession.faseMessageCount) {
-                        const currentFase = data.fase || currentSession.currentFase || 1;
-                        if (!currentSession.faseMessageCount[currentFase]) {
-                            currentSession.faseMessageCount[currentFase] = 0;
-                        }
-                        currentSession.faseMessageCount[currentFase]++;
-                    }
-                    
                     updateProgress(data.progress, data.fase, data.fase_name);
                     
                     // Update session with response
@@ -1915,57 +1898,36 @@
 
         // Update progress based on conversation depth
         function updateProgress(progress, fase, faseName) {
-            // Calculate progress based on number of user messages and current fase
+            // Simple and effective progress calculation
             let calculatedProgress = 0;
             
             if (currentSession && currentSession.messages) {
                 // Count total user messages (excluding the initial 'start')
                 const totalUserMessages = currentSession.messages.filter(m => m.role === 'user' && m.content !== 'start').length;
                 
-                // Estimated questions per fase (average)
-                const questionsPerFase = 6;
+                // Simple formula: each message adds ~3-4% progress
+                // This gives visible feedback and feels responsive
+                const progressPerMessage = 3.5;
+                calculatedProgress = totalUserMessages * progressPerMessage;
                 
-                // Calculate base progress from completed fases
+                // Add bonus for fase completion (makes fase transitions feel rewarding)
                 const completedFases = fase - 1;
-                const baseProgress = (completedFases / currentTotalFases) * 100;
+                const faseBonus = completedFases * 5; // 5% bonus per completed fase
+                calculatedProgress += faseBonus;
                 
-                // Track messages per fase
-                if (!currentSession.faseMessageCount) {
-                    currentSession.faseMessageCount = {};
+                // Ensure minimum visible progress (5% after first message)
+                if (totalUserMessages > 0 && calculatedProgress < 5) {
+                    calculatedProgress = 5;
                 }
                 
-                // Initialize or get current fase message count
-                if (!currentSession.faseMessageCount[fase]) {
-                    currentSession.faseMessageCount[fase] = 0;
-                }
-                
-                // Count messages in current fase (approximate by tracking last known fase)
-                if (currentSession.lastFase !== fase) {
-                    // Fase changed, reset counter
-                    currentSession.faseMessageCount[fase] = 0;
-                    currentSession.lastFase = fase;
-                }
-                
-                // Increment message count for current fase
-                const messagesInCurrentFase = currentSession.faseMessageCount[fase];
-                
-                // Calculate progress within current fase (each question = percentage of fase)
-                const faseWeight = 100 / currentTotalFases;
-                const progressPerQuestion = faseWeight / questionsPerFase;
-                const currentFaseProgress = Math.min(messagesInCurrentFase * progressPerQuestion, faseWeight);
-                
-                // Combine base progress + current fase progress
-                calculatedProgress = baseProgress + currentFaseProgress;
-                
-                // Ensure minimum visible progress (at least 3% after first message)
-                if (totalUserMessages > 0 && calculatedProgress < 3) {
-                    calculatedProgress = 3;
-                }
+                // Ensure we're at least at the fase baseline
+                const faseBaseline = ((fase - 1) / currentTotalFases) * 100;
+                calculatedProgress = Math.max(calculatedProgress, faseBaseline);
                 
                 // Cap at 95% until interview is complete
                 calculatedProgress = Math.min(calculatedProgress, 95);
                 
-                console.log(`Progress: Fase ${fase}/${currentTotalFases}, Messages in fase: ${messagesInCurrentFase}, Progress: ${Math.round(calculatedProgress)}%`);
+                console.log(`Progress: Fase ${fase}/${currentTotalFases}, Total messages: ${totalUserMessages}, Progress: ${Math.round(calculatedProgress)}%`);
             } else {
                 // Fallback to server-provided progress
                 calculatedProgress = progress || 0;
