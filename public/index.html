@@ -1321,7 +1321,9 @@
                 });
                 
                 console.log('Chat response status:', response.status);
-                const data = await response.json();
+                const responseText = await response.text();
+                console.log('Chat response text:', responseText);
+                const data = JSON.parse(responseText);
                 console.log('Chat response data:', data);
                 
                 if (data.type === 'agent_message') {
