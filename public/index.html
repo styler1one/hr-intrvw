@@ -1085,16 +1085,15 @@
             
             container.classList.remove('hidden');
             
-            // Auto-scroll to show the last message and suggestions
-            // Wait a bit longer to ensure suggestions are rendered and layout is stable
+            // Auto-scroll to bottom to show suggestions without covering the last message
+            // Wait for suggestions to render
             setTimeout(() => {
-                const chatMessages = document.getElementById('chatMessages');
-                const messages = chatMessages.querySelectorAll('.message');
-                if (messages.length > 0) {
-                    const lastMessage = messages[messages.length - 1];
-                    lastMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 400);
+                const chatContainer = document.getElementById('chatMessages').parentElement;
+                chatContainer.scrollTo({
+                    top: chatContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
         
         function useSuggestion(suggestion) {
