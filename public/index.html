@@ -1327,6 +1327,9 @@
         
         // Send initial message to start interview
         async function sendInitialMessage() {
+            // Show typing indicator
+            showTypingIndicator();
+            
             try {
                 const response = await fetch(`${API_BASE}/api/chat`, {
                     method: 'POST',
@@ -1344,6 +1347,9 @@
                 console.log('Chat response text:', responseText);
                 const data = JSON.parse(responseText);
                 console.log('Chat response data:', data);
+                
+                // Hide typing indicator
+                hideTypingIndicator();
                 
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
@@ -1366,6 +1372,7 @@
             } catch (error) {
                 console.error('Error sending initial message:', error);
                 console.error('Error details:', error.message);
+                hideTypingIndicator();
                 addMessage(`Verbindingsfout: ${error.message}. Check de browser console voor details.`, 'system');
             }
         }
@@ -1476,6 +1483,9 @@
             // Disable button temporarily
             const button = document.getElementById('sendButton');
             button.disabled = true;
+            
+            // Show typing indicator
+            showTypingIndicator();
 
             try {
                 // Send to server via REST API with session data
@@ -1491,6 +1501,9 @@
                 });
                 
                 const data = await response.json();
+                
+                // Hide typing indicator
+                hideTypingIndicator();
                 
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
@@ -1512,6 +1525,7 @@
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
+                hideTypingIndicator();
                 addMessage('Verbindingsfout. Probeer opnieuw.', 'system');
             } finally {
                 button.disabled = false;
@@ -1530,6 +1544,44 @@
         function autoResize(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = Math.min(textarea.scrollHeight, 128) + 'px';
+        }
+        
+        // Show typing indicator
+        function showTypingIndicator() {
+            const container = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'message-enter';
+            typingDiv.innerHTML = `
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1 bg-white border border-gray-200 px-5 py-3 rounded-2xl rounded-tl-md shadow-sm">
+                        <div class="flex gap-1 items-center">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            
+            // Scroll to bottom
+            setTimeout(() => {
+                typingDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
+        }
+        
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            const typingDiv = document.getElementById('typingIndicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
         }
 
         // Add message
