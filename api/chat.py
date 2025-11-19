@@ -55,34 +55,38 @@ Laten we beginnen!
 
 **Vraag 1:** In wat voor organisatie werk je? (sector, grootte, landen)"""
                 else:
-                    # Use OpenAI for other messages
-                    import openai
+                    # Use Anthropic Claude
+                    import anthropic
                     
-                    api_key = os.getenv("OPENAI_API_KEY")
+                    api_key = os.getenv("ANTHROPIC_API_KEY")
                     if not api_key:
-                        raise Exception("OPENAI_API_KEY not configured in Vercel environment variables")
+                        raise Exception("ANTHROPIC_API_KEY not configured in Vercel environment variables")
                     
-                    client = openai.OpenAI(api_key=api_key)
+                    client = anthropic.Anthropic(api_key=api_key)
                     
                     # Simple system prompt
                     system_prompt = """Je bent de Volentis HR Implementation Interview Agent.
 Je helpt organisaties om de Volentis HR Agent te implementeren.
 Stel ÉÉN vraag tegelijk. Wees zakelijk en helder."""
                     
-                    # Build messages for OpenAI
-                    messages = [{"role": "system", "content": system_prompt}]
+                    # Build messages for Claude (no system in messages array)
+                    messages = []
                     for msg in session["messages"]:
-                        messages.append({"role": msg["role"], "content": msg["content"]})
+                        if msg["role"] != "system":
+                            messages.append({
+                                "role": msg["role"],
+                                "content": msg["content"]
+                            })
                     
-                    # Call OpenAI
-                    response = client.chat.completions.create(
-                        model=os.getenv("LLM_MODEL", "gpt-4-turbo"),
-                        messages=messages,
-                        temperature=0.7,
-                        max_tokens=500
+                    # Call Claude
+                    response = client.messages.create(
+                        model=os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
+                        max_tokens=1024,
+                        system=system_prompt,
+                        messages=messages
                     )
                     
-                    ai_message = response.choices[0].message.content
+                    ai_message = response.content[0].text
                 
                 # Add AI response to session
                 session["messages"].append({

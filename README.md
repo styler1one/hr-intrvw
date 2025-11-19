@@ -1,14 +1,13 @@
 # HR Interview Agent
 
-AI-powered interview agent for HR implementation planning.
+AI-powered interview agent for HR implementation planning using Anthropic Claude.
 
 ## Setup
 
-Required environment variables:
-- `OPENAI_API_KEY`
-- `LLM_PROVIDER`
-- `LLM_MODEL`
+Required environment variables in Vercel:
+- `ANTHROPIC_API_KEY` - Your Anthropic API key
+- `ANTHROPIC_MODEL` - Model name (default: claude-3-5-sonnet-20241022)
 
 ## Deployment
 
-Configured for Vercel serverless deployment.
+Configured for Vercel serverless deployment with Anthropic Claude.
