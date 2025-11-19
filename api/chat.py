@@ -80,7 +80,7 @@ Stel ÉÉN vraag tegelijk. Wees zakelijk en helder."""
                     
                     # Call Claude
                     response = client.messages.create(
-                        model=os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
+                        model=os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
                         max_tokens=1024,
                         system=system_prompt,
                         messages=messages

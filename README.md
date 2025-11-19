@@ -6,7 +6,7 @@ AI-powered interview agent for HR implementation planning using Anthropic Claude
 
 Required environment variables in Vercel:
 - `ANTHROPIC_API_KEY` - Your Anthropic API key
-- `ANTHROPIC_MODEL` - Model name (default: claude-3-5-sonnet-20241022)
+- `ANTHROPIC_MODEL` - Model name (default: claude-sonnet-4-20250514)
 
 ## Deployment
 
