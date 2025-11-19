@@ -123,24 +123,36 @@ Stel ÉÉN vraag tegelijk. Wees zakelijk en helder."""
                 self.wfile.write(json.dumps(response_data).encode())
                 
             except Exception as e:
-                print(f"OpenAI Error: {e}")
+                import traceback
+                error_details = traceback.format_exc()
+                print(f"AI Error: {e}")
+                print(f"Traceback: {error_details}")
+                
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 error_response = {
                     "type": "error",
-                    "message": f"AI Error: {str(e)}"
+                    "message": f"AI Error: {str(e)}",
+                    "details": error_details
                 }
                 self.wfile.write(json.dumps(error_response).encode())
                 
         except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
             print(f"Chat Error: {e}")
+            print(f"Traceback: {error_details}")
+            
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode())
+            self.wfile.write(json.dumps({
+                "error": str(e),
+                "details": error_details
+            }).encode())
     
     def do_OPTIONS(self):
         """Handle CORS preflight"""
