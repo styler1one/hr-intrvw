@@ -1320,7 +1320,9 @@
                     })
                 });
                 
+                console.log('Chat response status:', response.status);
                 const data = await response.json();
+                console.log('Chat response data:', data);
                 
                 if (data.type === 'agent_message') {
                     addMessage(data.content, 'agent');
@@ -1337,7 +1339,8 @@
                 }
             } catch (error) {
                 console.error('Error sending initial message:', error);
-                addMessage('Verbindingsfout. Probeer de pagina te verversen.', 'system');
+                console.error('Error details:', error.message);
+                addMessage(`Verbindingsfout: ${error.message}. Check de browser console voor details.`, 'system');
             }
         }
 
