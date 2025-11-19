@@ -10,11 +10,11 @@ from urllib.parse import urlparse, parse_qs
 
 # Import from config - use relative import for Vercel
 try:
-    from ._config import SESSIONS, get_template
+    from ._config import SESSIONS, get_template, save_sessions, load_sessions
 except ImportError:
     import sys
     sys.path.insert(0, os.path.dirname(__file__))
-    from _config import SESSIONS, get_template
+    from _config import SESSIONS, get_template, save_sessions, load_sessions
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -25,7 +25,10 @@ class handler(BaseHTTPRequestHandler):
             query_params = parse_qs(parsed_url.query)
             session_id = query_params.get('session_id', [None])[0]
             
-            if not session_id or session_id not in SESSIONS:
+            # Load sessions from file
+            sessions = load_sessions()
+            
+            if not session_id or session_id not in sessions:
                 self.send_error(404, "Session not found")
                 return
             
@@ -35,7 +38,7 @@ class handler(BaseHTTPRequestHandler):
             data = json.loads(body.decode('utf-8'))
             message_content = data.get('content', '')
             
-            session = SESSIONS[session_id]
+            session = sessions[session_id]
             
             # Add user message
             session["messages"].append({
@@ -99,6 +102,10 @@ Stel ÉÉN vraag tegelijk. Wees zakelijk en helder."""
                 })
                 
                 session["updated_at"] = datetime.now().isoformat()
+                
+                # Save updated session
+                sessions[session_id] = session
+                save_sessions(sessions)
                 
                 # Calculate progress
                 total_fases = session.get("total_fases", 11)

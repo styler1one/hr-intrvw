@@ -8,12 +8,12 @@ from datetime import datetime
 
 # Import from config - use relative import for Vercel
 try:
-    from ._config import SESSIONS, get_template
+    from ._config import SESSIONS, get_template, save_sessions, load_sessions
 except ImportError:
     import sys
     import os
     sys.path.insert(0, os.path.dirname(__file__))
-    from _config import SESSIONS, get_template
+    from _config import SESSIONS, get_template, save_sessions, load_sessions
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -45,7 +45,10 @@ class handler(BaseHTTPRequestHandler):
                 "partial_data": {}
             }
             
-            SESSIONS[session_id] = session
+            # Reload sessions to get latest state
+            sessions = load_sessions()
+            sessions[session_id] = session
+            save_sessions(sessions)
             
             # Send response
             self.send_response(200)

@@ -1,6 +1,33 @@
 """
 Shared configuration for API endpoints
 """
+import os
+import json
+
+# Use environment variable or file-based storage for sessions
+# Note: This is a temporary solution - for production use a database
+SESSIONS_FILE = '/tmp/sessions.json' if os.path.exists('/tmp') else 'sessions.json'
+
+def load_sessions():
+    """Load sessions from file"""
+    try:
+        if os.path.exists(SESSIONS_FILE):
+            with open(SESSIONS_FILE, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading sessions: {e}")
+    return {}
+
+def save_sessions(sessions):
+    """Save sessions to file"""
+    try:
+        with open(SESSIONS_FILE, 'w') as f:
+            json.dump(sessions, f)
+    except Exception as e:
+        print(f"Error saving sessions: {e}")
+
+# Load existing sessions
+SESSIONS = load_sessions()
 
 INTERVIEW_TEMPLATES = {
     "quick": {
