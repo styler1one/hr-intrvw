@@ -1000,15 +1000,21 @@
             
             currentQuestion = question;
             
-            // Fetch AI-generated suggestions from API
+            // Skip suggestions for the first question (welcome message)
+            if (!currentSession || !currentSession.messages || currentSession.messages.length <= 1) {
+                return;
+            }
+            
+            // Generate context-aware suggestions using Claude
             try {
-                const response = await fetch(`${API_BASE}/api/session/${currentSessionId}/suggestions`, {
+                const response = await fetch(`${API_BASE}/api/suggestions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        question: question
+                        question: question,
+                        session: currentSession
                     })
                 });
                 
