@@ -252,9 +252,12 @@
    - Commit: 36af8c1
 
 2. **Suggesties Timeout** - ✅ OPGELOST
-   - Probleem: 5s timeout te kort voor AI suggesties
-   - Oplossing: Verhoogd naar 15s
-   - Commit: ff42543
+   - Probleem: 15s timeout te kort, fallback suggesties werden getoond
+   - Oplossing: 
+     a) Verhoogd naar 25s (frontend + 30s backend)
+     b) Fallback suggesties verwijderd (lege lijst bij falen)
+     c) Prompt geoptimaliseerd voor snelheid
+   - Commits: ff42543, 6d99c7e
 
 3. **Vercel Serverless Timeout** - ✅ OPGELOST
    - Probleem: vercel.json had maxDuration: 30 ingesteld
@@ -275,12 +278,18 @@
 
 ### Geïmplementeerd
 1. **Timeout Management** - ✅ DONE
-   - Chat API: 60s timeout
-   - Suggesties API: 15s timeout
+   - Chat API: 60s timeout (frontend + backend)
+   - Suggesties API: 25s timeout frontend + 30s backend
    - Betere error messages
 
+2. **AI Suggesties Optimalisatie** - ✅ DONE
+   - Fallback suggesties verwijderd
+   - Prompt geoptimaliseerd (korter = sneller)
+   - Lege lijst bij timeout (geen generieke suggesties meer)
+   - Getest: Werkt perfect met context-specifieke suggesties
+
 ### Voorgesteld
-*Nog geen verbeteringen voorgesteld*
+*Geen verdere verbeteringen nodig - alles werkt goed!*
 
 ---
 
