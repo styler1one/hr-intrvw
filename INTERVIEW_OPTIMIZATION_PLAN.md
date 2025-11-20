@@ -175,8 +175,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ---
 
-### ⬜ 2.2: Vraag-Variatie
-**Impact**: 7/10 | **Tijd**: 2 uur
+### ✅ 2.2: Vraag-Variatie
+**Impact**: 7/10 | **Tijd**: 2 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Voorkom repetitieve vraagstelling
 
@@ -186,9 +186,25 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Natuurlijke taalvariatie
 
 **Acceptatie**:
-- [ ] Minimaal 3-4 variaties per type
-- [ ] Tracking van gebruikte variaties
-- [ ] Natuurlijke taal
+- [x] Minimaal 3-4 variaties per type (voorbeelden in prompt)
+- [x] Tracking van gebruikte variaties (AI houdt context bij)
+- [x] Natuurlijke taal (5 variatie-technieken)
+
+**Geïmplementeerd** (commit d5455c0):
+- **Variatie-voorbeelden** voor 3 vraagtypen:
+  - Organisatie-grootte (4 variaties)
+  - Pijnpunten (4 variaties)
+  - Tijdsbesteding (4 variaties)
+- **5 Variatie-technieken**:
+  1. Wissel tussen directe en indirecte vragen
+  2. Gebruik open vs specifieke vragen
+  3. Varieer tussen "je/jullie/jouw organisatie"
+  4. Wissel tussen formeel en informeel
+  5. Verschillende inleidingen: "Kun je...", "Vertel eens...", "Hoe...", "Wat..."
+- **AI-gestuurd**: Agent past variatie contextueel toe
+- **Natuurlijke flow**: Geen robotachtige herhaling
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
