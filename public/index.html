@@ -1601,7 +1601,13 @@
             showTypingIndicator();
             
             try {
-                const response = await fetch(`${API_BASE}/api/chat`, {
+                // Create timeout promise (60 seconds for chat API)
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Request timeout - probeer het opnieuw')), 60000)
+                );
+                
+                // Send to server
+                const fetchPromise = fetch(`${API_BASE}/api/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1611,6 +1617,9 @@
                         session: currentSession
                     })
                 });
+                
+                // Race between fetch and timeout
+                const response = await Promise.race([fetchPromise, timeoutPromise]);
                 
                 console.log('Chat response status:', response.status);
                 const responseText = await response.text();
@@ -1643,7 +1652,13 @@
                 console.error('Error sending initial message:', error);
                 console.error('Error details:', error.message);
                 hideTypingIndicator();
-                addMessage(`Verbindingsfout: ${error.message}. Check de browser console voor details.`, 'system');
+                
+                // Better error messages
+                const errorMsg = error.message.includes('timeout') 
+                    ? 'Het starten van het interview duurt te lang. Probeer het opnieuw.'
+                    : `Verbindingsfout: ${error.message}. Check de browser console voor details.`;
+                
+                addMessage(errorMsg, 'system');
             }
         }
 
@@ -1757,8 +1772,13 @@
             showTypingIndicator();
 
             try {
+                // Create timeout promise (60 seconds for chat API)
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Request timeout - probeer het opnieuw')), 60000)
+                );
+                
                 // Send to server via REST API with session data
-                const response = await fetch(`${API_BASE}/api/chat`, {
+                const fetchPromise = fetch(`${API_BASE}/api/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1768,6 +1788,9 @@
                         session: currentSession
                     })
                 });
+                
+                // Race between fetch and timeout
+                const response = await Promise.race([fetchPromise, timeoutPromise]);
                 
                 const data = await response.json();
                 
@@ -1795,8 +1818,14 @@
             } catch (error) {
                 console.error('Error sending message:', error);
                 hideTypingIndicator();
-                showToast('Verbindingsfout. Probeer opnieuw.', 'error');
-                addMessage('Verbindingsfout. Probeer opnieuw.', 'system');
+                
+                // Better error messages
+                const errorMsg = error.message.includes('timeout') 
+                    ? 'De vraag duurt te lang om te verwerken. Probeer het opnieuw of maak je antwoord korter.'
+                    : 'Verbindingsfout. Probeer opnieuw.';
+                
+                showToast(errorMsg, 'error');
+                addMessage(errorMsg, 'system');
             } finally {
                 button.disabled = false;
             }
