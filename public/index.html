@@ -342,6 +342,65 @@
                         </svg>
                         Hervatten
                     </button>
+                    <div class="relative">
+                        <button 
+                            id="exportButton"
+                            onclick="toggleExportMenu()"
+                            class="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                            title="Exporteer interview data"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Export
+                        </button>
+                        <div 
+                            id="exportMenu"
+                            class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50"
+                        >
+                            <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="font-semibold text-gray-900 dark:text-white">📊 Export Opties</h3>
+                            </div>
+                            <div class="p-2">
+                                <button onclick="exportData('json')" class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center gap-2">
+                                    <span>📄</span>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">JSON Data</div>
+                                        <div class="text-xs text-gray-500">Gestructureerde data</div>
+                                    </div>
+                                </button>
+                                <button onclick="exportData('csv')" class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center gap-2">
+                                    <span>📊</span>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">CSV Spreadsheet</div>
+                                        <div class="text-xs text-gray-500">Excel compatible</div>
+                                    </div>
+                                </button>
+                                <button onclick="exportData('md')" class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center gap-2">
+                                    <span>📝</span>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">Markdown</div>
+                                        <div class="text-xs text-gray-500">Leesbaar format</div>
+                                    </div>
+                                </button>
+                                <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                                <button onclick="generateReport()" class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center gap-2">
+                                    <span>📋</span>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">Implementation Report</div>
+                                        <div class="text-xs text-gray-500">8 secties, professional</div>
+                                    </div>
+                                </button>
+                                <button onclick="generateChecklist()" class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center gap-2">
+                                    <span>✅</span>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">Implementation Checklist</div>
+                                        <div class="text-xs text-gray-500">81 checkboxes, actionable</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2084,6 +2143,176 @@
                     toast.classList.add('toast-exit');
                     setTimeout(() => toast.remove(), 300);
                 }, duration);
+            }
+        }
+
+        // Export menu toggle
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Close export menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const exportButton = document.getElementById('exportButton');
+            const exportMenu = document.getElementById('exportMenu');
+            
+            if (exportButton && exportMenu && !exportButton.contains(event.target) && !exportMenu.contains(event.target)) {
+                exportMenu.classList.add('hidden');
+            }
+        });
+
+        // Export data function
+        async function exportData(format) {
+            if (!currentSession) {
+                showToast('Geen actieve sessie om te exporteren', 'error');
+                return;
+            }
+
+            try {
+                showToast(`Exporteren naar ${format.toUpperCase()}...`, 'info', 2000);
+                
+                const response = await fetch('/api/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        format: format,
+                        session: currentSession
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Export failed: ${response.statusText}`);
+                }
+
+                // Get filename from Content-Disposition header
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `volentis_interview_${Date.now()}.${format}`;
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="(.+)"/);
+                    if (match) filename = match[1];
+                }
+
+                // Download file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showToast(`✅ ${format.toUpperCase()} geëxporteerd!`, 'success');
+                toggleExportMenu();
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('Export mislukt. Probeer opnieuw.', 'error');
+            }
+        }
+
+        // Generate Implementation Report
+        async function generateReport() {
+            if (!currentSession) {
+                showToast('Geen actieve sessie voor rapport', 'error');
+                return;
+            }
+
+            try {
+                showToast('Genereren Implementation Report...', 'info', 2000);
+                
+                const response = await fetch('/api/generate_report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session: currentSession
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Report generation failed: ${response.statusText}`);
+                }
+
+                // Get filename
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `volentis_implementation_readiness_${Date.now()}.md`;
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="(.+)"/);
+                    if (match) filename = match[1];
+                }
+
+                // Download file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showToast('✅ Implementation Report gegenereerd!', 'success');
+                toggleExportMenu();
+            } catch (error) {
+                console.error('Report generation error:', error);
+                showToast('Rapport generatie mislukt. Probeer opnieuw.', 'error');
+            }
+        }
+
+        // Generate Implementation Checklist
+        async function generateChecklist() {
+            if (!currentSession) {
+                showToast('Geen actieve sessie voor checklist', 'error');
+                return;
+            }
+
+            try {
+                showToast('Genereren Implementation Checklist...', 'info', 2000);
+                
+                const response = await fetch('/api/generate_checklist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session: currentSession
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Checklist generation failed: ${response.statusText}`);
+                }
+
+                // Get filename
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `volentis_implementation_checklist_${Date.now()}.md`;
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="(.+)"/);
+                    if (match) filename = match[1];
+                }
+
+                // Download file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showToast('✅ Implementation Checklist gegenereerd!', 'success');
+                toggleExportMenu();
+            } catch (error) {
+                console.error('Checklist generation error:', error);
+                showToast('Checklist generatie mislukt. Probeer opnieuw.', 'error');
             }
         }
 
