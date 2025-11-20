@@ -13,6 +13,7 @@
 - ✅ Expert HR-consultant persona geïmplementeerd
 - ✅ 11-fase structuur in system prompt
 - ✅ AI suggesties, validatie, personalisatie werken
+- ✅ **Focus aangepast** - Van "verkopen" naar "implementatie" (klant heeft al gekozen)
 - ⚠️ **Geen gestructureerde output** (JSON export)
 - ⚠️ **Geen deliverables** (rapporten, checklists)
 - ⚠️ **Beperkte fase-definitie** in templates
