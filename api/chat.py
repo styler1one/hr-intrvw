@@ -527,12 +527,23 @@ Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, reco
                         fase_num = partial_json.get("fase", current_fase)
                         session["fase_data"][f"fase_{fase_num}"] = partial_json
                 
+                # Analyze if this is a follow-up question (for tracking)
+                is_followup = self.detect_followup_question(ai_message)
+                
                 # Add AI response to session
                 session["messages"].append({
                     "role": "assistant",
                     "content": ai_message,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
+                    "is_followup": is_followup
                 })
+                
+                # Track follow-up statistics
+                if "followup_stats" not in session:
+                    session["followup_stats"] = {"total_questions": 0, "followup_questions": 0}
+                session["followup_stats"]["total_questions"] += 1
+                if is_followup:
+                    session["followup_stats"]["followup_questions"] += 1
                 
                 session["updated_at"] = datetime.now().isoformat()
                 
@@ -593,6 +604,57 @@ Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, reco
                 "error": str(e),
                 "details": error_details
             }).encode())
+    
+    def detect_followup_question(self, message: str) -> bool:
+        """
+        Detect if the AI message contains a follow-up question
+        Returns True if message contains indicators of a follow-up/clarifying question
+        """
+        # Indicators of follow-up questions
+        followup_indicators = [
+            # Dutch follow-up phrases
+            "kun je daar wat meer over vertellen",
+            "kun je dat toelichten",
+            "kun je een voorbeeld geven",
+            "kun je dat kwantificeren",
+            "hoe uit zich dat",
+            "wat bedoel je",
+            "kun je dat specificeren",
+            "hoeveel",
+            "hoe vaak",
+            "wanneer",
+            "waar komt dat door",
+            "wat is de reden",
+            "kun je dat concreet maken",
+            "bijvoorbeeld",
+            "hoe lang",
+            "wat maakt dat",
+            # Question patterns
+            "?",  # Has question mark
+        ]
+        
+        message_lower = message.lower()
+        
+        # Check for follow-up indicators
+        indicator_count = sum(1 for indicator in followup_indicators[:-1] if indicator in message_lower)
+        
+        # If multiple indicators or specific follow-up phrases, likely a follow-up
+        if indicator_count >= 2:
+            return True
+        
+        # Check for specific follow-up patterns
+        specific_patterns = [
+            "kun je",
+            "hoeveel",
+            "hoe vaak",
+            "wat is de",
+            "waar komt",
+        ]
+        
+        has_question = "?" in message
+        has_specific_pattern = any(pattern in message_lower for pattern in specific_patterns)
+        
+        return has_question and has_specific_pattern
     
     def extract_json(self, text: str):
         """Extract JSON from agent response"""

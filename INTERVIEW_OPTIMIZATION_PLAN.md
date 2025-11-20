@@ -132,7 +132,7 @@
 
 **Totaal**: 296 regels fase-specifieke instructies
 
-**Test Status**: ⏳ Wacht op test (API beschikbaarheid)
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
