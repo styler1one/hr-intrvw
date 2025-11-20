@@ -1104,13 +1104,15 @@ Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, reco
                 
                 session["updated_at"] = datetime.now().isoformat()
                 
-                # Extract structured data from conversation
-                self.extract_structured_data(session, current_fase, client, api_key)
-                
                 # Calculate progress
                 total_fases = session.get("total_fases", 11)
                 current_fase = session.get("current_fase", 1)
                 progress = (current_fase / total_fases) * 100
+                
+                # Extract structured data from conversation (after every 3-4 messages)
+                message_count = len(session.get("messages", []))
+                if message_count >= 4 and message_count % 3 == 0:
+                    self.extract_structured_data(session, current_fase, client, api_key)
                 
                 # Get fase definition for additional context
                 fase_def = get_fase_definition(current_fase)
