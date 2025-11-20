@@ -4,6 +4,7 @@
     { "source": "/api/start", "destination": "/api/start" },
     { "source": "/api/chat", "destination": "/api/chat" },
     { "source": "/api/suggestions", "destination": "/api/suggestions" },
+    { "source": "/api/export", "destination": "/api/export" },
     { "source": "/api/test", "destination": "/api/test" }
   ],
   "functions": {

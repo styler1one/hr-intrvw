@@ -122,7 +122,7 @@
 
 ---
 
-### **Taak 1.3: Export API Endpoint**
+### **Taak 1.3: Export API Endpoint** 🔄 IN PROGRESS
 **Doel**: Klant kan interview data exporteren
 
 **Acties**:
@@ -138,11 +138,14 @@
 **Complexiteit**: Medium  
 **Impact**: Hoog
 
+**Status**: 🔄 **BEZIG**  
+**Start tijd**: 20 nov 2025, 15:56
+
 **Acceptatie criteria**:
-- [x] `/api/export?format=json` werkt
-- [x] `/api/export?format=csv` werkt
-- [x] `/api/export?format=md` werkt
-- [x] Download functionaliteit in UI
+- [ ] `/api/export?format=json` werkt
+- [ ] `/api/export?format=csv` werkt
+- [ ] `/api/export?format=md` werkt
+- [ ] Download functionaliteit in UI
 
 ---
 
