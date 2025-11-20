@@ -514,8 +514,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ---
 
-### ⬜ 5.2: Consistentie-Checks
-**Impact**: 7/10 | **Tijd**: 2 uur
+### ✅ 5.2: Consistentie-Checks
+**Impact**: 7/10 | **Tijd**: 2 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Detecteer tegenstrijdigheden
 
@@ -525,10 +525,35 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Optioneel (niet blokkeren)
 
 **Acceptatie**:
-- [ ] Detectie inconsistenties
-- [ ] Vriendelijke vragen
-- [ ] Niet confronterend
-- [ ] Optioneel
+- [x] Detectie inconsistenties (5 types)
+- [x] Vriendelijke vragen (niet confronterend)
+- [x] Niet confronterend (ga uit van miscommunicatie)
+- [x] Optioneel (accepteer "weet ik niet meer")
+
+**Geïmplementeerd** (commit e2e63dc):
+- **5 Types inconsistenties**:
+  1. **Cijfermatig**: "100 medewerkers" vs "50 FTE"
+  2. **Tijdlijn**: "5 jaar geleden" vs "vorig jaar"
+  3. **Proces**: "Geautomatiseerd" vs "handmatig"
+  4. **Prioriteit**: "Top prioriteit" vs "niet belangrijk"
+  5. **Stakeholder**: "HR beslist" vs "Management beslist"
+
+- **Vriendelijke aanpak**:
+  - Niet confronterend (ga uit van miscommunicatie)
+  - Geef beide versies: "Je zei [X], maar ook [Y]..."
+  - Vraag om opheldering: "Kun je dat toelichten?"
+  - Bied uitweg: "Of heb ik iets verkeerd begrepen?"
+  - Optioneel: Als gebruiker niet kan/wil ophelderen, ga door
+
+- **12 Clarificatie-voorbeelden**:
+  - Cijfers: "Ik noteerde [X], maar nu hoor ik [Y]. Welke is correct?"
+  - Processen: "Help me even: je beschreef [A], maar nu klinkt het als [B]?"
+  - Prioriteiten: "Wat is belangrijker: [X] of [Y]? Ik hoorde beide."
+  - Stakeholders: "Wie heeft het laatste woord: [A] of [B]?"
+
+**Regel**: Als gebruiker zegt "weet ik niet meer" of "maakt niet uit", accepteer dat en ga door.
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
