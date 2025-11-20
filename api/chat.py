@@ -1104,6 +1104,9 @@ Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, reco
                 
                 session["updated_at"] = datetime.now().isoformat()
                 
+                # Extract structured data from conversation
+                self.extract_structured_data(session, current_fase, client, api_key)
+                
                 # Calculate progress
                 total_fases = session.get("total_fases", 11)
                 current_fase = session.get("current_fase", 1)
@@ -1216,6 +1219,82 @@ Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, reco
         has_specific_pattern = any(pattern in message_lower for pattern in specific_patterns)
         
         return has_question and has_specific_pattern
+    
+    def extract_structured_data(self, session: dict, current_fase: int, client, api_key: str):
+        """
+        Extract structured data from conversation using Claude
+        Uses fase_definitions to know which fields to extract
+        """
+        try:
+            # Get fase definition to know which fields to extract
+            fase_def = get_fase_definition(current_fase)
+            output_fields = fase_def.get("output_fields", [])
+            
+            if not output_fields:
+                return
+            
+            # Get conversation history for this fase
+            messages = session.get("messages", [])
+            if len(messages) < 2:  # Need at least 1 Q&A
+                return
+            
+            # Build conversation context (last 10 messages)
+            conversation_text = ""
+            for msg in messages[-10:]:
+                role = "Interviewer" if msg["role"] == "assistant" else "User"
+                conversation_text += f"{role}: {msg['content']}\n\n"
+            
+            # Create extraction prompt
+            extraction_prompt = f"""Analyseer dit interview-gesprek en extraheer de volgende informatie:
+
+Fase: {fase_def.get('fase_name')}
+Doel: {fase_def.get('doel')}
+
+Te extraheren velden:
+{', '.join(output_fields)}
+
+Gesprek:
+{conversation_text}
+
+Geef ALLEEN een JSON object terug met de gevonden informatie. Gebruik null voor velden die niet gevonden zijn.
+Formaat:
+{{
+  {', '.join([f'"{field}": "waarde of null"' for field in output_fields[:3]])}
+  ...
+}}"""
+            
+            # Call Claude for extraction
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1000,
+                messages=[{
+                    "role": "user",
+                    "content": extraction_prompt
+                }]
+            )
+            
+            # Parse response
+            extracted_text = response.content[0].text.strip()
+            extracted_data = self.extract_json(extracted_text)
+            
+            if extracted_data:
+                # Store in session
+                if "structured_data" not in session:
+                    session["structured_data"] = {}
+                
+                session["structured_data"][f"fase_{current_fase}"] = {
+                    "fase_name": fase_def.get("fase_name"),
+                    "data": extracted_data,
+                    "extracted_at": datetime.now().isoformat(),
+                    "confidence": "medium"  # Could be enhanced with confidence scoring
+                }
+                
+                print(f"✅ Extracted data for fase {current_fase}: {len(extracted_data)} fields")
+            
+        except Exception as e:
+            print(f"⚠️ Data extraction error for fase {current_fase}: {e}")
+            # Don't fail the interview if extraction fails
+            pass
     
     def extract_json(self, text: str):
         """Extract JSON from agent response"""

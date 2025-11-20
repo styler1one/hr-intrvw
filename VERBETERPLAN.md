@@ -73,9 +73,20 @@
 - [x] Output fields per fase
 - [x] Advies-haakjes aanwezig
 
+**Status**: ✅ **VOLTOOID**  
+**Test resultaten**: Zie `TAAK_1.1_TEST_RESULTATEN.md`  
+**Bevindingen**:
+- ✅ Fase-namen correct in UI ("Organisatie Context")
+- ✅ Implementatie-focus correct doorgevoerd
+- ✅ 77 output fields over 11 fases
+- ✅ Helper functies werken perfect
+- ✅ Geen errors, clean deployment
+
+**Commits**: 9d09477, eaed3e1, 1c716cb
+
 ---
 
-### **Taak 1.2: Gestructureerde Data Extractie**
+### **Taak 1.2: Gestructureerde Data Extractie** 🔄 IN PROGRESS
 **Doel**: AI extraheert gestructureerde data tijdens interview
 
 **Acties**:
@@ -88,6 +99,9 @@
 **Geschatte tijd**: 3 uur  
 **Complexiteit**: Hoog  
 **Impact**: Kritisch
+
+**Status**: 🔄 **BEZIG**  
+**Start tijd**: 20 nov 2025, 15:48
 
 **Acceptatie criteria**:
 - [x] Data extractie per fase
