@@ -294,7 +294,12 @@
                 </button>
                 <div class="flex-1">
                     <h1 id="sessionTitle" class="text-lg font-semibold text-gray-800">Volentis Interview Agent</h1>
-                    <div id="sessionSubtitle" class="text-sm text-gray-500">Start een nieuw interview om te beginnen</div>
+                    <button id="faseInfoToggle" onclick="toggleFaseInfo()" class="hidden text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span id="faseInfoToggleText">Toon fase info</span>
+                    </button>
                 </div>
                 <div id="progressIndicator" class="hidden flex items-center gap-3">
                     <div class="text-right">
@@ -2072,9 +2077,10 @@
                 progressPercent.textContent = Math.round(calculatedProgress) + '%';
             }
             
-            const subtitle = document.getElementById('sessionSubtitle');
-            if (subtitle) {
-                subtitle.textContent = `Fase ${fase}/${currentTotalFases}: ${faseName}`;
+            // Show fase info toggle button
+            const faseToggle = document.getElementById('faseInfoToggle');
+            if (faseToggle && currentSession && currentSession.messages && currentSession.messages.length > 0) {
+                faseToggle.classList.remove('hidden');
             }
             
             // Update fase info panel
@@ -2393,7 +2399,14 @@
         // Toggle fase info panel
         function toggleFaseInfo() {
             const panel = document.getElementById('faseInfoPanel');
+            const toggleText = document.getElementById('faseInfoToggleText');
+            
             panel.classList.toggle('hidden');
+            
+            // Update toggle button text
+            if (toggleText) {
+                toggleText.textContent = panel.classList.contains('hidden') ? 'Toon fase info' : 'Verberg fase info';
+            }
             
             // Save preference
             localStorage.setItem('faseInfoHidden', panel.classList.contains('hidden'));
