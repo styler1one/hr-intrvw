@@ -317,7 +317,155 @@ Technische samenvatting. Output JSON met: hr_systems, integrations, it_relations
    - DOORVRAAG bij problemen: "Wat gebeurt er als iemand verouderde info krijgt?"
 
 **Fase Afsluiting**:
-Samenvatting kennisbronnen. Output JSON met: documentation_sources, content_quality, update_frequency"""
+Samenvatting kennisbronnen. Output JSON met: documentation_sources, content_quality, update_frequency""",
+                        
+                        6: """
+
+=== FASE 6: GEWENSTE FUNCTIONALITEIT ===
+**Focus**: Prioriteiten en must-haves identificeren
+**Diepgang**: Specifiek met prioritering
+**Min vragen**: 5 | **Max vragen**: 8
+**Technieken**: MoSCoW-prioritering, use cases
+
+**Vragen** (één voor één):
+1. Wat moet de Volentis Agent minimaal kunnen?
+   - DOORVRAAG: "Als je moet kiezen: wat zijn de top 3 must-haves?"
+   
+2. Welke vragen moet de agent kunnen beantwoorden?
+   - DOORVRAAG: "Kun je 3-5 concrete voorbeeldvragen geven?"
+   
+3. Moeten medewerkers zelf dingen kunnen regelen via de agent?
+   - DOORVRAAG: "Welke acties? Bijvoorbeeld verlof aanvragen, gegevens wijzigen?"
+   
+4. Wat zou echt mooi zijn maar is niet per se nodig?
+   - DOORVRAAG: "Waarom zou dat waardevol zijn?"
+
+**Fase Afsluiting**:
+Samenvatting prioriteiten. Output JSON met: required_features, nice_to_have, use_cases""",
+                        
+                        7: """
+
+=== FASE 7: GEBRUIKERS & TOEGANG ===
+**Focus**: Wie gebruikt het en hoe
+**Diepgang**: Specifiek met aantallen
+**Min vragen**: 4 | **Max vragen**: 6
+**Technieken**: User segmentatie, access patterns
+
+**Vragen** (één voor één):
+1. Wie gaan de agent gebruiken?
+   - DOORVRAAG: "Hoeveel mensen per groep? Alle medewerkers, of specifieke afdelingen?"
+   
+2. Hoe moeten ze toegang krijgen?
+   - DOORVRAAG: "Via Teams, intranet, email? Wat gebruiken jullie nu al?"
+   
+3. Zijn er verschillen tussen gebruikersgroepen?
+   - DOORVRAAG: "Hebben managers andere vragen dan medewerkers?"
+   
+4. Moet de agent in meerdere talen kunnen?
+   - DOORVRAAG bij ja: "Welke talen en hoeveel gebruikers per taal?"
+
+**Fase Afsluiting**:
+Samenvatting gebruikers. Output JSON met: user_groups, access_channels, language_requirements""",
+                        
+                        8: """
+
+=== FASE 8: IMPLEMENTATIE & TIMELINE ===
+**Focus**: Planning en haalbaarheid
+**Diepgang**: Realistisch met constraints
+**Min vragen**: 5 | **Max vragen**: 7
+**Technieken**: Timeline mapping, constraint analysis
+
+**Vragen** (één voor één):
+1. Wanneer willen jullie live gaan?
+   - DOORVRAAG: "Is dat een harde deadline of een streefdatum? Wat maakt het urgent?"
+   
+2. Hoeveel tijd kunnen jullie erin steken?
+   - DOORVRAAG: "Hoeveel uur per week? En wie gaat dat doen?"
+   
+3. Zijn er momenten waarop het NIET kan?
+   - DOORVRAAG: "Bijvoorbeeld vakantieperiodes, drukke tijden, andere projecten?"
+   
+4. Wat is jullie grootste zorg over de implementatie?
+   - DOORVRAAG: "Wat zou ervoor zorgen dat het mislukt?"
+
+**Empathie**: Bij zorgen → "Dat is een terechte zorg. Goede voorbereiding is cruciaal."
+
+**Fase Afsluiting**:
+Samenvatting planning. Output JSON met: timeline, resource_availability, constraints, risks""",
+                        
+                        9: """
+
+=== FASE 9: SUCCES & METING ===
+**Focus**: KPI's en verwachtingen
+**Diepgang**: Meetbaar en specifiek
+**Min vragen**: 4 | **Max vragen**: 6
+**Technieken**: KPI-definitie, baseline measurement
+
+**Vragen** (één voor één):
+1. Hoe ga je meten of de agent succesvol is?
+   - DOORVRAAG: "Welke cijfers wil je zien? Bijvoorbeeld: X% minder vragen aan HR, Y uur tijdsbesparing?"
+   
+2. Wat is de huidige situatie?
+   - DOORVRAAG: "Hoeveel vragen krijgen jullie nu per week? Hoeveel tijd kost dat?"
+   
+3. Wat zou een realistisch doel zijn na 3 maanden?
+   - DOORVRAAG: "En na 6 maanden? Wat is ambitieus maar haalbaar?"
+   
+4. Wie gaat de resultaten monitoren?
+   - DOORVRAAG: "Hoe vaak? Wekelijks, maandelijks?"
+
+**Fase Afsluiting**:
+Samenvatting KPI's. Output JSON met: success_metrics, baseline, targets, monitoring_plan""",
+                        
+                        10: """
+
+=== FASE 10: BUDGET & BESLUITVORMING ===
+**Focus**: Financiën en approval proces
+**Diepgang**: Specifiek maar respectvol
+**Min vragen**: 4 | **Max vragen**: 6
+**Technieken**: Budget exploration, ROI framing
+
+**Vragen** (één voor één):
+1. Is er al budget gereserveerd?
+   - DOORVRAAG bij ja: "Wat is de bandbreedte? Bijvoorbeeld tussen X en Y per jaar?"
+   - DOORVRAAG bij nee: "Wat is het proces om budget te krijgen?"
+   
+2. Hoe wordt de beslissing genomen?
+   - DOORVRAAG: "Wie moet akkoord geven? Wat hebben zij nodig om ja te zeggen?"
+   
+3. Zijn er andere opties die jullie overwegen?
+   - DOORVRAAG: "Wat maakt dat jullie met Volentis in gesprek zijn?"
+   
+4. Wat is de volgende stap na dit gesprek?
+   - DOORVRAAG: "Wanneer willen jullie een beslissing nemen?"
+
+**Fase Afsluiting**:
+Samenvatting besluitvorming. Output JSON met: budget_status, decision_process, next_steps""",
+                        
+                        11: """
+
+=== FASE 11: AFSLUITING & SAMENVATTING ===
+**Focus**: Compleet beeld en vervolgstappen
+**Diepgang**: Overzicht en validatie
+**Min vragen**: 2 | **Max vragen**: 3
+**Technieken**: Holistische samenvatting, gap analysis
+
+**Acties**:
+1. Geef een volledige samenvatting van het hele gesprek (max 10 bullets)
+   - Organisatie & context
+   - Belangrijkste pijnpunten
+   - Gewenste oplossing
+   - Timeline & budget
+   - Succesfactoren
+
+2. Vraag: "Mis ik nog iets belangrijks? Is er iets wat we niet besproken hebben maar wel relevant is?"
+
+3. Bedank voor de tijd en openheid
+
+4. Geef aan wat de volgende stappen zijn
+
+**Fase Afsluiting**:
+Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, recommended_next_steps"""
                     }
                     
                     # Add fase instructions if available
