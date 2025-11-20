@@ -435,8 +435,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ---
 
-### ⬜ 4.3: Nieuwsgierigheid-Triggers
-**Impact**: 7/10 | **Tijd**: 2 uur
+### ✅ 4.3: Nieuwsgierigheid-Triggers
+**Impact**: 7/10 | **Tijd**: 2 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Maak gebruiker nieuwsgierig naar volgende stappen
 
@@ -445,9 +445,29 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Creëer anticipatie
 
 **Acceptatie**:
-- [ ] Triggers op strategische momenten
-- [ ] Creëert anticipatie
-- [ ] Niet te veel beloven
+- [x] Triggers op strategische momenten (4 fases)
+- [x] Creëert anticipatie (naar volgende stappen)
+- [x] Niet te veel beloven (realistisch)
+
+**Geïmplementeerd** (commit 706dace):
+- **4 Strategische momenten** voor nieuwsgierigheid-triggers:
+  1. **Fase 3** (na organisatie & stakeholders): "Straks kijken we hoe we dit concreet aanpakken..." (3 variaties)
+  2. **Fase 5** (na processen & systemen): "Met deze info kunnen we straks naar oplossingen kijken..." (3 variaties)
+  3. **Fase 7** (na functionaliteit & gebruikers): "We hebben nu een helder beeld. Straks: timing en implementatie..." (3 variaties)
+  4. **Fase 9** (na succes & meting): "We zijn bijna klaar. Straks: laatste praktische zaken..." (3 variaties)
+
+- **12 Anticipatie-zinnen** totaal met variatie
+- **Regels**:
+  - Eenmalig per fase
+  - Realistisch (niet te veel beloven)
+  - Relevant voor hun situatie
+  - Gecombineerd met transitie
+  - Kort en krachtig (max 1 zin)
+
+**Voorbeeld**:
+"Interessant. Dit helpt ons om straks gerichte aanbevelingen te doen. Laten we nu kijken naar jullie documentatie..."
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
