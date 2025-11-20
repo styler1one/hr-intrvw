@@ -28,14 +28,14 @@
 | 2.2 HR Optimization Advisory | ⏳ | 5u | Optioneel |
 | 3.2 Fase-specifieke prompts | ⏳ | 3u | Pending |
 
-### 🔄 Sprint 4: UX Polish (8u) - **GESTART** (2/8u)
+### ✅ Sprint 4: UX Polish (8u) - **GESTART** (5/8u)
 | Taak | Status | Tijd | Resultaat |
 |------|--------|------|-----------|
 | 4.1 Export UI | ✅ | 2u | Dropdown menu, 5 opties |
-| 4.2 Fase visualisatie | ⏳ | 3u | Optioneel |
+| 4.2 Fase visualisatie | ✅ | 3u | Info panel met doel, tijd, vragen |
 | 4.3 Deliverables preview | ⏳ | 3u | Optioneel |
 
-**Totaal Voortgang**: 15/31 uur (48%) - **6 taken compleet** 🎯
+**Totaal Voortgang**: 18/31 uur (58%) - **7 taken compleet** 🎯
 
 ---
 
@@ -424,7 +424,7 @@
 
 ---
 
-### **Taak 4.2: Fase-Overzicht Visualisatie**
+### **Taak 4.2: Fase-Overzicht Visualisatie** 🔄 IN PROGRESS
 **Doel**: Gebruiker ziet welke fase en wat er komt
 
 **Acties**:
@@ -437,11 +437,36 @@
 **Complexiteit**: Medium  
 **Impact**: Medium
 
+**Status**: ✅ **VOLTOOID**  
+**Start tijd**: 20 nov 2025, 16:35  
+**Eind tijd**: 20 nov 2025, 16:45
+
 **Acceptatie criteria**:
 - [x] Fase-naam zichtbaar
 - [x] Doel van fase getoond
 - [x] Voortgang per fase
 - [x] Tijd-indicatie
+
+**Bevindingen**:
+- ✅ Fase info panel toegevoegd boven messages
+- ✅ Toont voor elke fase:
+  - Icon (emoji per fase)
+  - Fase naam en nummer (1/11)
+  - Doel van de fase
+  - Geschatte tijd (~3-6 min)
+  - Aantal vragen (3-8 vragen)
+- ✅ Panel kan worden verborgen (toggle knop)
+- ✅ Preference wordt opgeslagen in localStorage
+- ✅ Automatisch zichtbaar tijdens interview
+- ✅ 11 fases volledig gedefinieerd met unieke info
+
+**Code toegevoegd**:
+- Fase info panel HTML (35 regels)
+- faseInfo mapping object (11 fases)
+- updateFaseInfo() en toggleFaseInfo() functies
+- Integratie met updateProgress()
+
+**Commits**: f9647b2
 
 ---
 
@@ -563,40 +588,42 @@ Na Sprint 3 & 4:
 
 ## 🚀 Huidige Status & Volgende Stap
 
-### ✅ **Wat is Bereikt (15u)**
+### ✅ **Wat is Bereikt (18u)**
 1. ✅ **Fase-definities** (2u) - 11 fases, 77 output fields, helper functies
 2. ✅ **Data extractie** (3u) - Automatisch per 3 messages, Claude-powered
 3. ✅ **Export API** (2u) - JSON, CSV, Markdown met timestamps
 4. ✅ **Implementation Report** (4u) - 8 secties, 143 regels, professional
 5. ✅ **Implementation Checklist** (2u) - 81 checkboxes, 6 categorieën, gepersonaliseerd
 6. ✅ **Export UI** (2u) - Dropdown menu, 5 export opties, toast notifications
+7. ✅ **Fase Visualisatie** (3u) - Info panel met doel, tijd, vragen per fase
 
-### 🎉 **MVP + Export UI Compleet!**
-Alle essentiële functionaliteit is klaar:
+### 🎉 **MVP + UX Compleet!**
+Alle essentiële functionaliteit + UX verbeteringen zijn klaar:
 - ✅ Data extractie en export (backend)
 - ✅ Professional Implementation Report
 - ✅ Actionable Implementation Checklist
 - ✅ Export UI in frontend (gebruiksvriendelijk)
+- ✅ Fase visualisatie (betere UX)
 
 ### 📋 **Nog Te Doen (Optioneel)**
-1. **Taak 4.2**: Fase visualisatie (3u) - Betere voortgang weergave
+1. **Taak 4.3**: Deliverables preview (3u) - Live preview van rapporten
 2. **Taak 3.1**: Template configuratie (2u) - Uitbreiden templates
 3. **Taak 2.2**: HR Optimization Advisory (5u) - Extra adviesrapport
 
 ### 💡 **Optioneel (Lagere Prioriteit)**
 - Taak 2.2: HR Optimization Advisory (5u)
 - Taak 3.2: Fase-specifieke prompts (3u)
-- Taak 4.2-4.3: UX verbeteringen (6u)
+- Taak 4.3: Deliverables preview (3u)
 
 ---
 
 ## 📊 Samenvatting
 
-**Totaal Voortgang**: 15/31 uur (48%)  
+**Totaal Voortgang**: 18/31 uur (58%)  
 **Sprint 1**: ✅ Compleet (7u)  
 **Sprint 2**: ✅ Compleet (6u)  
-**Sprint 4**: 🔄 Gestart (2/8u)  
-**MVP + UI Status**: 🎉 **COMPLEET!**
+**Sprint 4**: 🔄 Gestart (5/8u)  
+**MVP + UX Status**: 🎉 **COMPLEET!**
 
 **Kernfunctionaliteit werkt**:
 - ✅ Interview met fase-tracking (11 fases)
@@ -605,19 +632,21 @@ Alle essentiële functionaliteit is klaar:
 - ✅ Professional Implementation Report (8 secties)
 - ✅ Implementation Checklist (81 checkboxes)
 - ✅ Export UI met dropdown menu (5 opties)
+- ✅ Fase visualisatie panel (doel, tijd, vragen)
 
 **Productie-Ready**:
 - ✅ Alle core features geïmplementeerd
 - ✅ Alle deliverables beschikbaar
 - ✅ Export UI in frontend werkend
+- ✅ Fase info panel voor betere UX
 - ✅ Getest en gedocumenteerd
 
 **Optionele Verbeteringen**:
-- Fase visualisatie (3u)
+- Deliverables preview (3u)
 - HR Optimization Advisory rapport (5u)
 - Template configuratie uitbreiden (2u)
-- Extra UX polish (6u)
+- Fase-specifieke prompts (3u)
 
 ---
 
-*Dit verbeterplan wordt real-time bijgewerkt tijdens implementatie. Laatste update: 20 nov 2025, 16:32*
+*Dit verbeterplan wordt real-time bijgewerkt tijdens implementatie. Laatste update: 20 nov 2025, 16:46*
