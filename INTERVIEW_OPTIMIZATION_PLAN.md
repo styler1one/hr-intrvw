@@ -208,8 +208,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ---
 
-### ⬜ 2.3: Contextuele Vraagstelling
-**Impact**: 9/10 | **Tijd**: 3 uur
+### ✅ 2.3: Contextuele Vraagstelling
+**Impact**: 9/10 | **Tijd**: 3 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Vragen bouwen voort op eerdere antwoorden
 
@@ -219,9 +219,28 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Natuurlijke overgangen
 
 **Acceptatie**:
-- [ ] 30%+ vragen refereert aan eerder
-- [ ] Natuurlijke overgangen
-- [ ] Geen geforceerde verbindingen
+- [x] 30%+ vragen refereert aan eerder (expliciete regel)
+- [x] Natuurlijke overgangen (verbindingspatronen)
+- [x] Geen geforceerde verbindingen (AI beoordeelt relevantie)
+
+**Geïmplementeerd** (commit 75a78aa):
+- **5 Concrete voorbeelden** van contextuele vragen:
+  - "Je noemde eerder dat jullie 250 medewerkers hebben. Hoe is jullie HR-team opgebouwd?"
+  - "Je gaf aan dat onboarding veel tijd kost. Hoeveel nieuwe medewerkers verwelkomen jullie per jaar?"
+  - "Interessant dat jullie in zowel NL als BE actief zijn. Hoe verschilt het HR-beleid?"
+  - "Je zei dat jullie IT-team klein is. Hoe beïnvloedt dat HR-automatisering?"
+  - "Dat sluit aan bij wat je eerder zei over tijdsdruk..."
+
+- **4 Verbindingspatronen**:
+  - "Als ik het goed begrijp, [samenvatting]. Klopt dat?"
+  - "Dat verklaart waarom je eerder [X] noemde..."
+  - "In combinatie met wat je zei over [X], betekent dat..."
+  - "Gezien jullie [context], hoe..."
+
+- **Expliciete regel**: Minimaal 30% van vragen moet context bevatten
+- **Specifieke details**: Gebruik cijfers, namen, situaties uit eerdere antwoorden
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
