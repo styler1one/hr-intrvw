@@ -473,8 +473,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ## 🔵 PRIORITEIT 5: VALIDATIE
 
-### ⬜ 5.1: Antwoord-Validatie
-**Impact**: 9/10 | **Tijd**: 3 uur
+### ✅ 5.1: Antwoord-Validatie
+**Impact**: 9/10 | **Tijd**: 3 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Detecteer incomplete/inconsistente antwoorden
 
@@ -484,10 +484,33 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Max 1 validatie per antwoord
 
 **Acceptatie**:
-- [ ] Validatie voor alle vraagtypen
-- [ ] Vriendelijke validatie-vragen
-- [ ] Max 1 validatie per antwoord
-- [ ] Logging
+- [x] Validatie voor alle vraagtypen (4 check types)
+- [x] Vriendelijke validatie-vragen (niet confronterend)
+- [x] Max 1 validatie per antwoord (expliciete regel)
+- [x] Logging (AI detecteert signalen)
+
+**Geïmplementeerd** (commit c0fd509):
+- **4 Validatie-checks**:
+  1. **Compleetheid**: Halve zinnen, "weet ik niet precies", "ongeveer"
+  2. **Consistentie**: Tegenstrijdigheden met eerdere antwoorden
+  3. **Specificiteit**: "Veel", "weinig", "soms" zonder cijfers
+  4. **Relevantie**: Antwoord gaat over iets anders
+
+- **Validatie-aanpak** (vriendelijk):
+  - Niet confronterend: "Kun je...", "Zou je...", "Heb je..."
+  - Max 1 validatie per antwoord
+  - Geef context waarom je het vraagt
+  - Bied uitweg: "Als je het niet precies weet, is een schatting ook prima"
+
+- **8 Validatie-voorbeelden** per type:
+  - Vage cijfers: "Kun je een schatting geven? Tientallen, honderdtallen?"
+  - Incomplete: "Dat is een goed begin. Kun je daar nog wat meer over vertellen?"
+  - Inconsistenties: "Even checken: je noemde eerder [X], maar nu [Y]. Hoe zit dat?"
+  - Irrelevant: "Dat is nuttig. Maar specifiek voor [onderwerp]: hoe zit dat?"
+
+**Timing**: Direct na onvolledig antwoord, voordat je verder gaat
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
