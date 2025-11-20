@@ -2380,6 +2380,8 @@
         // Update fase info panel
         function updateFaseInfo(fase, faseName) {
             const panel = document.getElementById('faseInfoPanel');
+            if (!panel) return; // Safety check
+            
             const info = faseInfo[fase] || faseInfo[1];
             
             // Show panel if interview is active
@@ -2387,13 +2389,20 @@
                 panel.classList.remove('hidden');
             }
             
-            // Update content
-            document.getElementById('faseIcon').textContent = info.icon;
-            document.getElementById('faseName').textContent = faseName || `Fase ${fase}`;
-            document.getElementById('faseNumber').textContent = `${fase}/${currentTotalFases}`;
-            document.getElementById('faseDoel').textContent = info.doel;
-            document.getElementById('faseTime').textContent = info.time;
-            document.getElementById('faseQuestions').textContent = info.questions;
+            // Update content - with null checks
+            const faseIcon = document.getElementById('faseIcon');
+            const faseNameEl = document.getElementById('faseName');
+            const faseNumberEl = document.getElementById('faseNumber');
+            const faseDoelEl = document.getElementById('faseDoel');
+            const faseTimeEl = document.getElementById('faseTime');
+            const faseQuestionsEl = document.getElementById('faseQuestions');
+            
+            if (faseIcon) faseIcon.textContent = info.icon;
+            if (faseNameEl) faseNameEl.textContent = faseName || `Fase ${fase}`;
+            if (faseNumberEl) faseNumberEl.textContent = `${fase}/${currentTotalFases}`;
+            if (faseDoelEl) faseDoelEl.textContent = info.doel;
+            if (faseTimeEl) faseTimeEl.textContent = info.time;
+            if (faseQuestionsEl) faseQuestionsEl.textContent = info.questions;
         }
 
         // Toggle fase info panel
