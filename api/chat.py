@@ -12,10 +12,12 @@ from urllib.parse import urlparse, parse_qs
 # Import from config - use relative import for Vercel
 try:
     from ._config import SESSIONS, get_template, save_sessions, load_sessions
+    from .fase_definitions import get_fase_definition, get_fase_output_fields
 except ImportError:
     import sys
     sys.path.insert(0, os.path.dirname(__file__))
     from _config import SESSIONS, get_template, save_sessions, load_sessions
+    from fase_definitions import get_fase_definition, get_fase_output_fields
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -1107,6 +1109,9 @@ Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, reco
                 current_fase = session.get("current_fase", 1)
                 progress = (current_fase / total_fases) * 100
                 
+                # Get fase definition for additional context
+                fase_def = get_fase_definition(current_fase)
+                
                 # Send response
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -1120,7 +1125,8 @@ Volledige samenvatting. Output JSON met: complete_summary, gaps_identified, reco
                     "content": ai_message,
                     "progress": progress,
                     "fase": current_fase,
-                    "fase_name": f"Fase {current_fase}",
+                    "fase_name": fase_def.get("fase_name", f"Fase {current_fase}"),
+                    "fase_doel": fase_def.get("doel", ""),
                     "fase_complete": False,
                     "interview_complete": False,
                     "session": session  # Return updated session to frontend
