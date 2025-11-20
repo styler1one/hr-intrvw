@@ -71,7 +71,7 @@
 - Empathische reactie-templates
 - Contextuele vraagstelling instructies
 
-**Test Status**: ✅ Getest & Klaar voor Goedkeuring
+**Test Status**: ⚠️ Technisch Geïmplementeerd - API Overbelast (Externe Factor)
 
 **Test Resultaten** (commit 408bcbc):
 - ✅ Deployment succesvol
@@ -100,8 +100,8 @@
 
 ---
 
-### ⬜ 1.2: Fase-Specifieke Instructies
-**Impact**: 9/10 | **Tijd**: 2 uur
+### ✅ 1.2: Fase-Specifieke Instructies
+**Impact**: 9/10 | **Tijd**: 2 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Elke fase heeft eigen focus en diepgang
 
@@ -112,10 +112,27 @@
 - Documenteer technieken per fase
 
 **Acceptatie**:
-- [ ] Alle 11 fases hebben instructies
-- [ ] Min/max vragen bepaald
-- [ ] Doorvraag-triggers per fase
-- [ ] Technieken gedocumenteerd
+- [x] Alle 11 fases hebben instructies
+- [x] Min/max vragen bepaald (4-10 per fase)
+- [x] Doorvraag-triggers per fase gedefinieerd
+- [x] Technieken gedocumenteerd per fase
+
+**Geïmplementeerd** (commits 479fd59, 54b48c1):
+- **Fase 1**: Vertrouwen opbouwen, breed exploratief (5-8 vragen)
+- **Fase 2**: Pijnpunten identificeren, diep specifiek (5-8 vragen)
+- **Fase 3**: HR-processen inventariseren met tijdsindicaties (6-10 vragen)
+- **Fase 4**: Technisch landschap en integraties (5-8 vragen)
+- **Fase 5**: Documentatie en kennisbronnen (5-8 vragen)
+- **Fase 6**: Gewenste functionaliteit met prioritering (5-8 vragen)
+- **Fase 7**: Gebruikers en toegang (4-6 vragen)
+- **Fase 8**: Implementatie en timeline (5-7 vragen)
+- **Fase 9**: Succes en meting met KPI's (4-6 vragen)
+- **Fase 10**: Budget en besluitvorming (4-6 vragen)
+- **Fase 11**: Afsluiting en complete samenvatting (2-3 vragen)
+
+**Totaal**: 296 regels fase-specifieke instructies
+
+**Test Status**: ⏳ Wacht op test (API beschikbaarheid)
 
 ---
 
