@@ -28,14 +28,14 @@
 | 2.2 HR Optimization Advisory | ⏳ | 5u | Optioneel |
 | 3.2 Fase-specifieke prompts | ⏳ | 3u | Pending |
 
-### ⏳ Sprint 4: UX Polish (8u) - **PENDING**
+### 🔄 Sprint 4: UX Polish (8u) - **GESTART** (2/8u)
 | Taak | Status | Tijd | Resultaat |
 |------|--------|------|-----------|
-| 4.1 Export UI | ⏳ | 2u | Pending |
-| 4.2 Fase visualisatie | ⏳ | 3u | Pending |
-| 4.3 Deliverables preview | ⏳ | 3u | Pending |
+| 4.1 Export UI | ✅ | 2u | Dropdown menu, 5 opties |
+| 4.2 Fase visualisatie | ⏳ | 3u | Optioneel |
+| 4.3 Deliverables preview | ⏳ | 3u | Optioneel |
 
-**Totaal Voortgang**: 13/31 uur (42%) - **5 taken compleet** 🎯
+**Totaal Voortgang**: 15/31 uur (48%) - **6 taken compleet** 🎯
 
 ---
 
@@ -378,7 +378,7 @@
 
 ## PRIORITEIT 4: UI/UX Verbeteringen
 
-### **Taak 4.1: Export UI**
+### **Taak 4.1: Export UI** ✅ VOLTOOID
 **Doel**: Gebruiker kan gemakkelijk exporteren
 
 **Acties**:
@@ -391,11 +391,36 @@
 **Complexiteit**: Laag  
 **Impact**: Medium
 
+**Status**: ✅ **VOLTOOID**  
+**Start tijd**: 20 nov 2025, 16:21  
+**Eind tijd**: 20 nov 2025, 16:30
+
 **Acceptatie criteria**:
 - [x] Export knop zichtbaar
-- [x] Format selectie werkt
-- [x] Download werkt
-- [x] Feedback aan gebruiker
+- [x] Format selectie werkt (dropdown menu)
+- [x] Download werkt (5 opties)
+- [x] Feedback aan gebruiker (toast notifications)
+
+**Bevindingen**:
+- ✅ Export knop toegevoegd naast Pauzeren knop
+- ✅ Dropdown menu met 5 opties:
+  - JSON Data (gestructureerde data)
+  - CSV Spreadsheet (Excel compatible)
+  - Markdown (leesbaar format)
+  - Implementation Report (8 secties)
+  - Implementation Checklist (81 checkboxes)
+- ✅ Toast notifications voor feedback
+- ✅ Automatic file download met correcte filenames
+- ✅ Error handling aanwezig
+- ✅ Menu sluit automatisch na selectie
+- ✅ Click-outside om menu te sluiten
+
+**Code toegevoegd**:
+- 229 regels JavaScript functies
+- toggleExportMenu(), exportData(), generateReport(), generateChecklist()
+- Dropdown UI met emoji's en beschrijvingen
+
+**Commits**: b595122
 
 ---
 
@@ -538,21 +563,23 @@ Na Sprint 3 & 4:
 
 ## 🚀 Huidige Status & Volgende Stap
 
-### ✅ **Wat is Bereikt (13u)**
+### ✅ **Wat is Bereikt (15u)**
 1. ✅ **Fase-definities** (2u) - 11 fases, 77 output fields, helper functies
 2. ✅ **Data extractie** (3u) - Automatisch per 3 messages, Claude-powered
 3. ✅ **Export API** (2u) - JSON, CSV, Markdown met timestamps
 4. ✅ **Implementation Report** (4u) - 8 secties, 143 regels, professional
 5. ✅ **Implementation Checklist** (2u) - 81 checkboxes, 6 categorieën, gepersonaliseerd
+6. ✅ **Export UI** (2u) - Dropdown menu, 5 export opties, toast notifications
 
-### 🎉 **Sprint 2 Compleet!**
-Alle core deliverables zijn klaar:
-- ✅ Data extractie en export
+### 🎉 **MVP + Export UI Compleet!**
+Alle essentiële functionaliteit is klaar:
+- ✅ Data extractie en export (backend)
 - ✅ Professional Implementation Report
 - ✅ Actionable Implementation Checklist
+- ✅ Export UI in frontend (gebruiksvriendelijk)
 
 ### 📋 **Nog Te Doen (Optioneel)**
-1. **Taak 4.1**: Export UI (2u) - Knop in frontend voor export
+1. **Taak 4.2**: Fase visualisatie (3u) - Betere voortgang weergave
 2. **Taak 3.1**: Template configuratie (2u) - Uitbreiden templates
 3. **Taak 2.2**: HR Optimization Advisory (5u) - Extra adviesrapport
 
@@ -565,30 +592,32 @@ Alle core deliverables zijn klaar:
 
 ## 📊 Samenvatting
 
-**Totaal Voortgang**: 13/31 uur (42%)  
+**Totaal Voortgang**: 15/31 uur (48%)  
 **Sprint 1**: ✅ Compleet (7u)  
 **Sprint 2**: ✅ Compleet (6u)  
-**MVP Status**: � **100% COMPLEET!**
+**Sprint 4**: 🔄 Gestart (2/8u)  
+**MVP + UI Status**: 🎉 **COMPLEET!**
 
 **Kernfunctionaliteit werkt**:
-- ✅ Interview met fase-tracking
+- ✅ Interview met fase-tracking (11 fases)
 - ✅ Data extractie en opslag (77 fields)
 - ✅ Export in 3 formaten (JSON, CSV, MD)
 - ✅ Professional Implementation Report (8 secties)
 - ✅ Implementation Checklist (81 checkboxes)
+- ✅ Export UI met dropdown menu (5 opties)
 
 **Productie-Ready**:
 - ✅ Alle core features geïmplementeerd
 - ✅ Alle deliverables beschikbaar
-- ✅ Getest en werkend
-- ⏳ Export UI optioneel (nice to have)
+- ✅ Export UI in frontend werkend
+- ✅ Getest en gedocumenteerd
 
 **Optionele Verbeteringen**:
-- Export UI knop in frontend (2u)
+- Fase visualisatie (3u)
 - HR Optimization Advisory rapport (5u)
 - Template configuratie uitbreiden (2u)
-- UX polish (8u)
+- Extra UX polish (6u)
 
 ---
 
-*Dit verbeterplan wordt real-time bijgewerkt tijdens implementatie. Laatste update: 20 nov 2025, 16:20*
+*Dit verbeterplan wordt real-time bijgewerkt tijdens implementatie. Laatste update: 20 nov 2025, 16:32*
