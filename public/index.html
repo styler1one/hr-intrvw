@@ -2086,9 +2086,9 @@
                 progressPercent.textContent = Math.round(calculatedProgress) + '%';
             }
             
-            // Show fase info toggle button
+            // Show fase info toggle button when interview is active
             const faseToggle = document.getElementById('faseInfoToggle');
-            if (faseToggle && currentSession && currentSession.messages && currentSession.messages.length > 0) {
+            if (faseToggle && currentSession) {
                 faseToggle.classList.remove('hidden');
             }
             
