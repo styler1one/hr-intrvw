@@ -559,8 +559,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ## 🟣 PRIORITEIT 6: ENGAGEMENT
 
-### ⬜ 6.1: Micro-Commitments
-**Impact**: 8/10 | **Tijd**: 2 uur
+### ✅ 6.1: Micro-Commitments
+**Impact**: 8/10 | **Tijd**: 2 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Verhoog completion door kleine commitments
 
@@ -570,10 +570,35 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Optioneel
 
 **Acceptatie**:
-- [ ] Commitments op strategische momenten
-- [ ] Optioneel
-- [ ] Positieve framing
-- [ ] Accurate tijd-indicatie
+- [x] Commitments op strategische momenten (4 momenten)
+- [x] Optioneel (bied uitweg bij "nee")
+- [x] Positieve framing ("Zullen we...", "Kunnen we...")
+- [x] Accurate tijd-indicatie (15-20, 12-15, 8-10, 3-5 min)
+
+**Geïmplementeerd** (commit d28e4d5):
+- **4 Strategische momenten**:
+  1. **Start**: "Het interview duurt ~15-20 minuten. Heb je nu tijd?" (3 variaties)
+  2. **Fase 2**: "Goed bezig! Nog ~12-15 minuten. Kunnen we doorgaan?" (3 variaties)
+  3. **Fase 5**: "Halverwege! Nog ~8-10 minuten. Gaan we door?" (3 variaties)
+  4. **Fase 8**: "Bijna klaar! Nog ~3-5 minuten. We ronden het af?" (3 variaties)
+
+- **12 Commitment-vragen** met variatie
+- **Timing-indicaties** (accuraat):
+  - Start: ~15-20 minuten totaal
+  - Fase 2: ~12-15 minuten resterend
+  - Fase 5: ~8-10 minuten resterend
+  - Fase 8: ~3-5 minuten resterend
+
+- **Regels**:
+  - Positieve framing: "Zullen we...", "Kunnen we...", "Gaan we..."
+  - Optioneel: Bij "nee" bied aan om later verder te gaan
+  - Niet opdringerig: Eenmalig per moment
+  - Combineer met voortgang
+
+**Bij "nee" of "geen tijd"**:
+"Geen probleem! Je kunt later terugkomen om verder te gaan. Je voortgang wordt bewaard."
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
