@@ -321,8 +321,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ---
 
-### ⬜ 3.3: Transitie-Zinnen
-**Impact**: 6/10 | **Tijd**: 1 uur
+### ✅ 3.3: Transitie-Zinnen
+**Impact**: 6/10 | **Tijd**: 1 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Soepele overgangen tussen onderwerpen
 
@@ -331,9 +331,28 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Variatie in zinnen
 
 **Acceptatie**:
-- [ ] Natuurlijke overgangen
-- [ ] Duidelijke fase-overgangen
-- [ ] Variatie in zinnen
+- [x] Natuurlijke overgangen (4 categorieën)
+- [x] Duidelijke fase-overgangen (4 variaties)
+- [x] Variatie in zinnen (15 transitie-zinnen totaal)
+
+**Geïmplementeerd** (commit 58948c3):
+- **4 Transitie-categorieën**:
+  1. **Hetzelfde onderwerp** (dieper ingaan) - 4 zinnen
+  2. **Nieuw onderwerp** (binnen fase) - 4 zinnen
+  3. **Fase-overgang** (naar nieuwe fase) - 4 zinnen
+  4. **Terugkomen op eerder punt** - 3 zinnen
+
+- **15 Transitie-zinnen** totaal met variatie
+- **Natuurlijke flow**: Voorkomt abrupte onderwerpwisselingen
+- **Variatie-instructie**: Wissel tussen zinnen om herhaling te voorkomen
+
+**Voorbeelden**:
+- "Laten we daar wat dieper op ingaan."
+- "Nu we dat helder hebben, wil ik graag verder praten over..."
+- "Perfect, we hebben nu een goed beeld van [fase]. Laten we nu kijken naar [volgende fase]."
+- "Je noemde eerder [X]. Laten we daar nog even op terugkomen..."
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
