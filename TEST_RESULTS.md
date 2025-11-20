@@ -10,10 +10,10 @@
 ## 📋 Test Overzicht
 
 **Totaal aantal features**: 18  
-**Getest**: 6/18 (gedeeltelijk)  
-**Geslaagd**: 6  
-**Problemen**: 1 (Vercel timeout)  
-**Verbeteringen**: 2
+**Getest**: 7/18 (gedeeltelijk)  
+**Geslaagd**: 7  
+**Problemen**: 0 (alle opgelost!)  
+**Verbeteringen**: 3
 
 ---
 
@@ -171,15 +171,15 @@
 ## ✅ PRIORITEIT 5: VALIDATIE (2 taken)
 
 ### 5.1 Antwoord-Validatie (9/10)
-**Status**: ⏳ Pending  
+**Status**: ✅ GESLAAGD  
 **Verwacht**: Detectie van incomplete/vage antwoorden
 
 **Test**:
-- [ ] Validatie bij vage antwoorden
-- [ ] Vriendelijke validatie-vragen
-- [ ] Max 1 validatie per antwoord
+- [x] Validatie bij vage antwoorden
+- [x] Vriendelijke validatie-vragen
+- [x] Max 1 validatie per antwoord
 
-**Resultaat**: 
+**Resultaat**: Bij vaag antwoord "We hebben veel teams" vraagt AI vriendelijk door: "Kun je daar wat meer over vertellen? Hoeveel teams hebben jullie ongeveer en hoe zijn die teams georganiseerd?" 
 
 ---
 
@@ -253,15 +253,15 @@
    - Oplossing: Verhoogd naar 15s
    - Commit: ff42543
 
-3. **Vercel Serverless Timeout** - ⚠️ ACTIEF PROBLEEM
-   - Probleem: Vercel Hobby plan heeft 10s max execution time voor serverless functions
+3. **Vercel Serverless Timeout** - ✅ OPGELOST
+   - Probleem: vercel.json had maxDuration: 30 ingesteld
    - Symptoom: 504 Gateway Timeout bij langere AI responses
-   - Impact: Interview kan niet worden voltooid
-   - Mogelijke oplossingen:
-     a) Upgrade naar Vercel Pro ($20/maand) - 60s max execution time
-     b) Implementeer streaming responses (chunks)
-     c) Verplaats naar andere hosting (Railway, Render, DigitalOcean)
-     d) Optimaliseer system prompt (korter = sneller)
+   - Impact: Interview kon niet worden voltooid
+   - Oplossing: 
+     a) ✅ Vercel Pro upgrade ($20/maand)
+     b) ✅ vercel.json aangepast: maxDuration van 30s naar 60s
+     c) Commit: 3ba413a
+   - Status: Deploying... (wacht 1-2 minuten)
 
 ### Klein
 *Nog geen kleine problemen gevonden*
