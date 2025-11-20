@@ -5,6 +5,7 @@
     { "source": "/api/chat", "destination": "/api/chat" },
     { "source": "/api/suggestions", "destination": "/api/suggestions" },
     { "source": "/api/export", "destination": "/api/export" },
+    { "source": "/api/generate_report", "destination": "/api/generate_report" },
     { "source": "/api/test", "destination": "/api/test" }
   ],
   "functions": {

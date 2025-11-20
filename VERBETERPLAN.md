@@ -168,8 +168,8 @@
 
 ## PRIORITEIT 2: Deliverables & Rapporten
 
-### **Taak 2.1: Implementation Readiness Report Generator**
-**Doel**: Automatisch PDF rapport na interview
+### **Taak 2.1: Implementation Readiness Report Generator** 🔄 IN PROGRESS
+**Doel**: Automatisch Markdown rapport na interview (PDF conversie optioneel)
 
 **Acties**:
 1. Maak `api/generate_report.py`
@@ -180,18 +180,21 @@
    - Content Inventory
    - Risico's & Blockers
    - Aanbevolen Aanpak
-3. Gebruik Markdown → PDF conversie (of HTML → PDF)
-4. Styling met Volentis branding
+3. Gebruik structured_data uit session
+4. Professional Markdown formatting
 
 **Geschatte tijd**: 4 uur  
 **Complexiteit**: Hoog  
 **Impact**: Zeer Hoog
 
+**Status**: 🔄 **BEZIG**  
+**Start tijd**: 20 nov 2025, 16:05
+
 **Acceptatie criteria**:
-- [x] PDF generatie werkt
-- [x] Alle secties aanwezig
-- [x] Professional layout
-- [x] Download knop in UI
+- [ ] Rapport generatie werkt
+- [ ] Alle secties aanwezig
+- [ ] Professional layout
+- [ ] Gebruikt structured_data
 
 ---
 
