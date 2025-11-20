@@ -154,52 +154,170 @@ After each fase, output JSON in this format:
 }
 ```"""
                     
-                    # Add fase-specific instructions
+                    # Add fase-specific instructions with focus, depth, and triggers
                     fase_instructions = {
                         1: """
 
-FASE 1 – INTRO & CONTEXT
+=== FASE 1: INTRO & CONTEXT ===
+**Focus**: Vertrouwen opbouwen en brede context verzamelen
+**Diepgang**: Breed en exploratief
+**Min vragen**: 5 | **Max vragen**: 8
+**Technieken**: Open vragen, actief luisteren, samenvatten
 
-BELANGRIJK: Stel vragen ÉÉN VOOR ÉÉN. Wacht op antwoord voordat je de volgende vraag stelt.
+**Doorvraag-triggers**:
+- Bij "klein/middelgroot/groot bedrijf" → Vraag exact aantal medewerkers
+- Bij sector-naam → Vraag naar specifieke uitdagingen in die sector
+- Bij "druk/hectisch" → Vraag hoeveel uur per week aan wat besteed wordt
+- Bij vage doelen → Vraag naar concrete KPI's of meetbare resultaten
 
-VRAGEN (stel ze één voor één):
+**Vragen** (één voor één):
 1. In wat voor organisatie werk je? (sector, grootte, aantal medewerkers, locaties)
+   - DOORVRAAG bij kort antwoord: "Kun je wat meer vertellen over jullie organisatie? Bijvoorbeeld over de structuur en hoe jullie georganiseerd zijn?"
+   
 2. Wat is jouw rol binnen HR?
+   - DOORVRAAG: "Hoeveel mensen zitten er in het HR-team en wat zijn jullie belangrijkste verantwoordelijkheden?"
+   
 3. Waarom kijken jullie nu naar een HR Agent zoals Volentis?
+   - DOORVRAAG: "Wat is de aanleiding? Is er een specifieke gebeurtenis of groeiende frustratie?"
+   
 4. Wat hoop je over 6-12 maanden verbeterd te hebben?
+   - DOORVRAAG: "Kun je dat kwantificeren? Bijvoorbeeld: X% minder tijd aan Y, of Z meer tevreden medewerkers?"
+   
 5. Wat is de HR-strategie voor de komende 2-3 jaar?
-6. Hoe zou je de organisatiecultuur beschrijven?
-7. Hoe is de werkdruk binnen HR?
-8. Zijn er recente reorganisaties of grote veranderingen geweest?
+   - DOORVRAAG bij vaag antwoord: "Wat zijn de concrete projecten of initiatieven die daaruit voortkomen?"
 
-FASE AFSLUITING:
-Na alle vragen: geef korte samenvatting (max 5 bullets) en vraag: "Klopt dit?"
+**Samenvatting na 3-4 vragen**: "Laat me even samenvatten wat ik tot nu toe hoor: [3 bullets]. Klopt dat?"
 
-Als bevestigd, output JSON met:
-- org_profile
-- hr_team_profile
-- strategic_focus
-- organizational_culture""",
+**Fase Afsluiting**:
+Geef volledige samenvatting (max 5 bullets) en vraag: "Heb ik dat goed begrepen?"
+Output JSON met: org_profile, hr_team_profile, strategic_focus, organizational_culture""",
+                        
                         2: """
 
-FASE 2 – STAKEHOLDERS
+=== FASE 2: STAKEHOLDERS & CHANGE READINESS ===
+**Focus**: Pijnpunten en weerstand identificeren
+**Diepgang**: Diep en specifiek
+**Min vragen**: 5 | **Max vragen**: 8
+**Technieken**: 5x Waarom, concrete voorbeelden, impact kwantificeren
 
-BELANGRIJK: Stel vragen ÉÉN VOOR ÉÉN. Wacht op antwoord voordat je de volgende vraag stelt.
+**Doorvraag-triggers**:
+- Bij stakeholder-namen → Vraag naar hun houding en invloed
+- Bij "weerstand" → Vraag naar concrete voorbeelden en oorzaken
+- Bij "vorige implementatie" → Vraag wat goed/fout ging en waarom
+- Bij algemene uitspraken → Vraag naar specifieke situaties
 
-VRAGEN (stel ze één voor één):
-1. Wie zijn de belangrijkste stakeholders voor deze implementatie? (bijv. MT, OR, IT, lijnmanagers)
+**Vragen** (één voor één):
+1. Wie zijn de belangrijkste stakeholders voor deze implementatie?
+   - DOORVRAAG: "Wat is hun huidige houding? Enthousiast, afwachtend, of sceptisch?"
+   
 2. Wie moet uiteindelijk akkoord geven op de implementatie?
-3. Zijn er groepen waar je weerstand verwacht? Waarom?
-4. Hoe staat jullie organisatie over het algemeen tegenover nieuwe technologie?
-5. Wat was de laatste grote HR-verandering en hoe verliep die?
+   - DOORVRAAG: "Wat zijn hun belangrijkste beslissingscriteria? Kosten, tijd, ROI, gebruikerstevredenheid?"
+   
+3. Zijn er groepen waar je weerstand verwacht?
+   - DOORVRAAG: "Kun je een concreet voorbeeld geven van eerdere weerstand? Hoe hebben jullie dat toen aangepakt?"
+   
+4. Hoe staat jullie organisatie tegenover nieuwe technologie?
+   - DOORVRAAG: "Wat was de laatste technologie-implementatie en hoe verliep die?"
+   
+5. Wat was de laatste grote HR-verandering?
+   - DOORVRAAG: "Wat ging goed en wat zou je anders doen? Wat heb je daarvan geleerd?"
 
-FASE AFSLUITING:
-Na alle vragen: geef korte samenvatting (max 5 bullets) en vraag: "Klopt dit?"
+**Empathie-moment**: Als weerstand/frustratie genoemd → "Dat herken ik. Change management is vaak de grootste uitdaging bij HR-implementaties."
 
-Als bevestigd, output JSON met:
-- stakeholders
-- change_history
-- change_readiness_preliminary"""
+**Fase Afsluiting**:
+Samenvatting + validatie. Output JSON met: stakeholders, change_history, change_readiness_preliminary""",
+                        
+                        3: """
+
+=== FASE 3: HUIDIGE HR-PROCESSEN ===
+**Focus**: Inventariseer huidige werkwijze en pijnpunten
+**Diepgang**: Specifiek met tijdsindicaties
+**Min vragen**: 6 | **Max vragen**: 10
+**Technieken**: Proces-mapping, tijdsbesteding kwantificeren
+
+**Doorvraag-triggers**:
+- Bij proces-naam → Vraag hoeveel tijd het kost per week/maand
+- Bij "veel vragen" → Vraag naar top 3 meest gestelde vragen
+- Bij "handmatig" → Vraag hoeveel handelingen/klikken nodig zijn
+- Bij frustratie → Toon empathie en vraag naar impact
+
+**Vragen** (één voor één):
+1. Welke HR-vragen krijgen jullie het meest?
+   - DOORVRAAG: "Kun je de top 3 noemen met een schatting hoe vaak per week?"
+   
+2. Hoe beantwoorden jullie die vragen nu?
+   - DOORVRAAG: "Hoeveel tijd kost het gemiddeld om één vraag te beantwoorden?"
+   
+3. Welke HR-processen kosten jullie het meeste tijd?
+   - DOORVRAAG: "Kun je dat kwantificeren in uren per week of maand?"
+   
+4. Waar loop je het meest tegenaan in je dagelijkse werk?
+   - DOORVRAAG: "Hoe uit zich dat? Kun je een concreet voorbeeld geven van vorige week?"
+
+**Empathie**: Bij tijdsdruk → "Tijdgebrek is de grootste frustratie die ik hoor van HR-professionals."
+
+**Fase Afsluiting**:
+Samenvatting met tijdsindicaties. Output JSON met: current_processes, pain_points, time_investment""",
+                        
+                        4: """
+
+=== FASE 4: HR-SYSTEMEN & INTEGRATIES ===
+**Focus**: Technische landschap en integratie-mogelijkheden
+**Diepgang**: Technisch specifiek
+**Min vragen**: 5 | **Max vragen**: 8
+**Technieken**: Systeem-inventarisatie, API-mogelijkheden
+
+**Doorvraag-triggers**:
+- Bij systeem-naam → Vraag naar versie en tevredenheid
+- Bij "koppeling" → Vraag of API beschikbaar is
+- Bij "handmatig overzetten" → Vraag frequentie en tijdsbesteding
+- Bij IT-betrokkenheid → Vraag naar relatie en samenwerking
+
+**Vragen** (één voor één):
+1. Welk HR-systeem gebruiken jullie als basis?
+   - DOORVRAAG: "Welke versie? En hoe tevreden zijn jullie daarover (1-10)?"
+   
+2. Welke andere systemen gebruiken jullie voor HR?
+   - DOORVRAAG: "Zijn die gekoppeld of werk je met losse systemen?"
+   
+3. Hoe is de samenwerking met IT?
+   - DOORVRAAG: "Hoe snel kunnen jullie aanpassingen doorvoeren? Dagen, weken, maanden?"
+   
+4. Zijn er API's beschikbaar voor jullie systemen?
+   - DOORVRAAG bij "weet niet": "Wie binnen IT zou dat kunnen weten?"
+
+**Fase Afsluiting**:
+Technische samenvatting. Output JSON met: hr_systems, integrations, it_relationship""",
+                        
+                        5: """
+
+=== FASE 5: DOCUMENTATIE & KENNISBRONNEN ===
+**Focus**: Beschikbare informatie en structuur
+**Diepgang**: Specifiek met voorbeelden
+**Min vragen**: 5 | **Max vragen**: 8
+**Technieken**: Inventarisatie, kwaliteitsbeoordeling
+
+**Doorvraag-triggers**:
+- Bij "handboek/wiki" → Vraag hoe actueel en toegankelijk
+- Bij "verspreid" → Vraag waar precies en hoe vindbaar
+- Bij "verouderd" → Vraag wanneer laatste update
+- Bij "niemand weet" → Vraag hoe nieuwe medewerkers info vinden
+
+**Vragen** (één voor één):
+1. Waar staat jullie HR-informatie nu?
+   - DOORVRAAG: "Hoe toegankelijk is dat voor medewerkers? Vinden ze het makkelijk?"
+   
+2. Hoe actueel is die informatie?
+   - DOORVRAAG: "Wanneer was de laatste grote update? Wie is verantwoordelijk voor updates?"
+   
+3. Zijn er standaard antwoorden/templates voor veelgestelde vragen?
+   - DOORVRAAG: "Kun je een voorbeeld geven van zo'n standaard antwoord?"
+   
+4. Hoe zorgen jullie dat informatie consistent blijft?
+   - DOORVRAAG bij problemen: "Wat gebeurt er als iemand verouderde info krijgt?"
+
+**Fase Afsluiting**:
+Samenvatting kennisbronnen. Output JSON met: documentation_sources, content_quality, update_frequency"""
                     }
                     
                     # Add fase instructions if available
