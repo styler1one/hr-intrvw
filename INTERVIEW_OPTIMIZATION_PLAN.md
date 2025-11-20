@@ -246,21 +246,42 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ## 🟡 PRIORITEIT 3: CONVERSATIE FLOW
 
-### ⬜ 3.1: Samenvattingen
-**Impact**: 8/10 | **Tijd**: 2 uur
+### ✅ 3.1: Samenvattingen
+**Impact**: 8/10 | **Tijd**: 2 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Toon dat agent luistert en begrijpt
 
 **Implementatie**:
-- Samenvatting bij fase-overgang
-- Elke 4 vragen korte samenvatting
-- Validatie-vraag aan einde
+- Samenvatting bij fase-overgangen
+- Periodieke samenvattingen tijdens fase
+- Validatie-vraag aan einde samenvatting
+- Correctie mogelijk door gebruiker
 
 **Acceptatie**:
-- [ ] Samenvattingen bij fase-overgangen
-- [ ] Periodieke samenvattingen
-- [ ] Validatie-vraag
-- [ ] Correctie mogelijk
+- [x] Samenvattingen bij fase-overgangen (max 5 bullets)
+- [x] Periodieke samenvattingen tijdens fase (elke 3-4 vragen, 2-3 bullets)
+- [x] Validatie-vraag aan einde samenvatting (altijd)
+- [x] Correctie mogelijk door gebruiker (wacht op bevestiging)
+
+**Geïmplementeerd** (commit b1f95db):
+- **4 Timing-triggers** voor samenvattingen:
+  1. Elke 3-4 vragen (korte samenvatting)
+  2. Bij fase-overgang (volledige samenvatting)
+  3. Bij complexe antwoorden (directe check)
+  4. Voor belangrijke beslissingen (context samenvatting)
+
+- **3 Inleidingen** voor variatie:
+  - "Laat me even samenvatten wat ik tot nu toe hoor..."
+  - "Als ik het goed begrijp..."
+  - "Wat ik hoor is..."
+
+- **2 Complete voorbeelden** met bullets en validatie
+- **Formaat-regels**:
+  - Max 3-5 bullets voor overzicht
+  - Altijd eindigen met validatie-vraag
+  - Wachten op bevestiging/correctie
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
