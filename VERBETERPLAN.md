@@ -279,29 +279,33 @@
 
 ---
 
-### **Taak 2.3: Implementation Checklist Generator**
+### **Taak 2.3: Implementation Checklist Generator** 🔄 IN PROGRESS
 **Doel**: Concrete checklist voor implementatie
 
 **Acties**:
-1. Template met 6 categorieën:
+1. Maak `api/generate_checklist.py`
+2. Template met 6 categorieën:
    - Pre-implementation tasks
    - Technical setup
    - Content preparation
    - Stakeholder engagement
    - Go-live checklist
    - Post-launch monitoring
-2. Personaliseer op basis van interview data
-3. Export naar Markdown + PDF
+3. Personaliseer op basis van interview data
+4. Export naar Markdown
 
 **Geschatte tijd**: 2 uur  
 **Complexiteit**: Medium  
 **Impact**: Hoog
 
+**Status**: 🔄 **BEZIG**  
+**Start tijd**: 20 nov 2025, 16:12
+
 **Acceptatie criteria**:
-- [x] Alle 6 categorieën
-- [x] Gepersonaliseerde items
-- [x] Checkbox format
-- [x] PDF export
+- [ ] Alle 6 categorieën
+- [ ] Gepersonaliseerde items
+- [ ] Checkbox format
+- [ ] Markdown export
 
 ---
 

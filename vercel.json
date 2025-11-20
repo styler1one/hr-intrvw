@@ -6,6 +6,7 @@
     { "source": "/api/suggestions", "destination": "/api/suggestions" },
     { "source": "/api/export", "destination": "/api/export" },
     { "source": "/api/generate_report", "destination": "/api/generate_report" },
+    { "source": "/api/generate_checklist", "destination": "/api/generate_checklist" },
     { "source": "/api/test", "destination": "/api/test" }
   ],
   "functions": {
