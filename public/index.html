@@ -1491,10 +1491,13 @@
         // Helper function to update session title in both mobile and desktop headers
         function updateSessionTitle(title, subtitle = '') {
             // Update desktop header
-            document.getElementById('sessionTitle').textContent = title;
-            if (subtitle) {
-                document.getElementById('sessionSubtitle').textContent = subtitle;
+            const sessionTitle = document.getElementById('sessionTitle');
+            if (sessionTitle) {
+                sessionTitle.textContent = title;
             }
+            
+            // Subtitle is now shown in fase info panel, not in header
+            // So we ignore the subtitle parameter
             
             // Update mobile header
             const mobileTitle = document.getElementById('mobileSessionTitle');
