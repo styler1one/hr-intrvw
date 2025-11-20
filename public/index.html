@@ -1206,9 +1206,9 @@
             
             // Generate context-aware suggestions using Claude with timeout
             try {
-                // Create timeout promise (15 seconds - suggesties mogen langer duren)
+                // Create timeout promise (25 seconds - genoeg tijd voor AI suggesties)
                 const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Timeout')), 15000)
+                    setTimeout(() => reject(new Error('Timeout')), 25000)
                 );
                 
                 // Create fetch promise

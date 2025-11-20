@@ -34,21 +34,12 @@ class handler(BaseHTTPRequestHandler):
                     role = "Interviewer" if msg["role"] == "assistant" else "Kandidaat"
                     context += f"{role}: {msg['content']}\n"
                 
-                # Create prompt for suggestions
-                prompt = f"""Gebaseerd op deze conversatie:
+                # Create prompt for suggestions (optimized for speed)
+                prompt = f"""Context: {context}
 
-{context}
+Vraag: "{question}"
 
-De interviewer heeft zojuist gevraagd: "{question}"
-
-Genereer 3-4 korte, relevante antwoord-suggesties (max 8 woorden per suggestie) die de kandidaat zou kunnen geven. 
-De suggesties moeten:
-- Relevant zijn voor de vraag
-- Passen bij de context van het gesprek
-- Variëren in detail/diepgang
-- Natuurlijk klinken in het Nederlands
-
-Geef alleen de suggesties, gescheiden door newlines, zonder nummering of extra tekst."""
+Geef 4 korte Nederlandse antwoord-suggesties (max 10 woorden). Alleen de suggesties, elk op nieuwe regel."""
 
                 response = client.messages.create(
                     model=os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
@@ -68,13 +59,8 @@ Geef alleen de suggesties, gescheiden door newlines, zonder nummering of extra t
                 
             except Exception as e:
                 print(f"Error generating suggestions: {e}")
-                # Fallback suggestions
-                suggestions = [
-                    "Ja, dat klopt",
-                    "Nee, nog niet",
-                    "Deels, laat me toelichten",
-                    "Weet ik niet zeker"
-                ]
+                # No fallback - return empty list if AI fails
+                suggestions = []
             
             # Send response
             self.send_response(200)
