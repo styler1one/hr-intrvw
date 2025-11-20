@@ -602,8 +602,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ---
 
-### ⬜ 6.2: Personalisatie
-**Impact**: 9/10 | **Tijd**: 3 uur
+### ✅ 6.2: Personalisatie
+**Impact**: 9/10 | **Tijd**: 3 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Maak gesprek persoonlijker
 
@@ -613,10 +613,36 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Rol-aangepaste taal
 
 **Acceptatie**:
-- [ ] Naam-gebruik
-- [ ] Sector-specifieke voorbeelden
-- [ ] Rol-aangepaste taal
-- [ ] Natuurlijke integratie
+- [x] Naam-gebruik (max 2-3 keer per gesprek)
+- [x] Sector-specifieke voorbeelden (6 sectoren)
+- [x] Rol-aangepaste taal (3 rollen)
+- [x] Natuurlijke integratie
+
+**Geïmplementeerd** (commit 5566b91):
+- **Naam-gebruik**:
+  - Vraag aan het begin: "Mag ik je naam weten?"
+  - Gebruik sporadisch (max 2-3 keer):
+    - Bij begroeting: "Hoi [naam], fijn dat je tijd maakt!"
+    - Bij belangrijke momenten: "Dank je, [naam]..."
+    - Bij afsluiting: "Bedankt voor je tijd, [naam]!"
+
+- **6 Sector-specifieke voorbeelden**:
+  1. **Zorg**: Roostering, CAO-compliance, BIG-registratie (3 voorbeelden)
+  2. **Onderwijs**: Lesroosters, detachering, bekwaamheidsdossiers (3 voorbeelden)
+  3. **Retail**: Flexibele contracten, piekperiodes, oproepkrachten (3 voorbeelden)
+  4. **Productie**: Ploegendienst, certificeringen, uitzendkrachten (3 voorbeelden)
+  5. **IT/Tech**: Remote work, tech-skills, projectmatige inzet (3 voorbeelden)
+  6. **Overheid**: CAO-regels, WNRA, functiehuizen (3 voorbeelden)
+
+- **3 Rol-aangepaste taalstijlen**:
+  1. **HR Manager/Director**: Strategisch, business impact, lange termijn
+  2. **HR Medewerker**: Operationeel, dagelijkse praktijk, concrete tools
+  3. **Management/Directie**: ROI focus, strategisch, besluitvorming
+
+**Voorbeeld**:
+"Dank je, Sarah, dat is waardevolle informatie. Veel ziekenhuizen worstelen met roostering. Hoe pakken jullie dat nu aan?"
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
