@@ -1204,9 +1204,15 @@
             // Show loading state for suggestions
             showSuggestionsLoading();
             
-            // Generate context-aware suggestions using Claude
+            // Generate context-aware suggestions using Claude with timeout
             try {
-                const response = await fetch(`${API_BASE}/api/suggestions`, {
+                // Create timeout promise (5 seconds)
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), 5000)
+                );
+                
+                // Create fetch promise
+                const fetchPromise = fetch(`${API_BASE}/api/suggestions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1217,6 +1223,9 @@
                     })
                 });
                 
+                // Race between fetch and timeout
+                const response = await Promise.race([fetchPromise, timeoutPromise]);
+                
                 if (response.ok) {
                     const data = await response.json();
                     if (data.suggestions && data.suggestions.length > 0) {
@@ -1226,17 +1235,13 @@
                 }
             } catch (error) {
                 console.error('Error fetching suggestions:', error);
+                // If timeout or error, just hide suggestions (no fallback)
+                hideSuggestions();
+                return;
             }
             
-            // Fallback to generic suggestions if API fails
-            const fallbackSuggestions = [
-                'Ja, dat klopt',
-                'Nee, nog niet',
-                'Deels, laat me toelichten',
-                'Weet ik niet zeker'
-            ];
-            
-            showSuggestions(fallbackSuggestions);
+            // If API returns empty suggestions, hide them
+            hideSuggestions();
         }
         
         function showSuggestionsLoading() {
