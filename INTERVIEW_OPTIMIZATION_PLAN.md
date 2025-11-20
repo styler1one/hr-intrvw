@@ -358,8 +358,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ## 🟢 PRIORITEIT 4: PSYCHOLOGIE
 
-### ⬜ 4.1: Progressie-Feedback
-**Impact**: 9/10 | **Tijd**: 2 uur
+### ✅ 4.1: Progressie-Feedback
+**Impact**: 9/10 | **Tijd**: 2 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Motiveer door voortgang te tonen
 
@@ -369,10 +369,29 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - Eenmalig per milestone
 
 **Acceptatie**:
-- [ ] Feedback bij milestones
-- [ ] Positieve toon
-- [ ] Eenmalig
-- [ ] Niet opdringerig
+- [x] Feedback bij milestones (4 milestones)
+- [x] Positieve toon (motiverende berichten)
+- [x] Eenmalig (expliciete instructie)
+- [x] Niet opdringerig (natuurlijk geïntegreerd)
+
+**Geïmplementeerd** (commit baf4d37):
+- **4 Milestones** met progressie-feedback:
+  1. **25% (fase 3)**: "Geweldig! We zijn al een kwart door..." (3 variaties)
+  2. **50% (fase 5-6)**: "Uitstekend! We zijn halverwege..." (3 variaties)
+  3. **75% (fase 8-9)**: "Bijna klaar! Nog een paar vragen..." (3 variaties)
+  4. **90% (fase 10-11)**: "Laatste loodjes! Nog één onderwerp..." (3 variaties)
+
+- **12 Motiverende berichten** totaal met variatie
+- **Timing-regels**:
+  - Eenmalig per milestone (niet herhalen)
+  - Natuurlijk geïntegreerd in gesprek
+  - Gecombineerd met transitie
+  - Kort en positief (max 1-2 zinnen)
+
+**Voorbeeld**:
+"Geweldig! We zijn al halverwege en je geeft waardevolle informatie. Laten we nu kijken naar jullie huidige HR-systemen..."
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
