@@ -1,0 +1,422 @@
+# 🎯 Interview Optimalisatie Plan
+## Maximale Informatie-Extractie & Gebruikersbetrokkenheid
+
+**Datum**: 20 november 2025  
+**Doel**: Gebruikers langer vasthouden en diepere, kwalitatieve informatie verzamelen  
+**Basis**: Huidige HR Interview Agent op http://hr.agentboss.nl
+
+---
+
+## 📋 HUIDIGE SITUATIE
+
+### ✅ Wat werkt:
+- AI-gestuurde vraagstelling
+- Fase-gebaseerde structuur (11 fases)
+- AI suggesties
+- Pauzeer/hervat functionaliteit
+
+### ❌ Wat ontbreekt:
+- Diepgang in doorvragen
+- Contextbehoud tussen vragen
+- Adaptieve vraagstelling
+- Validatie van antwoorden
+- Follow-up bij oppervlakkige antwoorden
+
+---
+
+## 🎯 DOELEN
+
+1. **Verhoog sessieduur** van ~15 min naar ~35-45 min
+2. **Verhoog completion rate** van 40% naar 75%+
+3. **Verbeter informatiekwaliteit** - Diepere antwoorden
+4. **Verhoog tevredenheid** - Waardevol gesprek
+
+---
+
+## 📊 6 OPTIMALISATIE GEBIEDEN
+
+### 1️⃣ SYSTEM PROMPT OPTIMALISATIE
+### 2️⃣ VRAAGSTELLING TECHNIEKEN
+### 3️⃣ CONVERSATIE FLOW
+### 4️⃣ PSYCHOLOGISCHE TRIGGERS
+### 5️⃣ VALIDATIE & KWALITEIT
+### 6️⃣ ENGAGEMENT MECHANISMEN
+
+---
+
+## 🔴 PRIORITEIT 1: SYSTEM PROMPT
+
+### ✅ 1.1: Verbeter System Prompt met Domeinkennis
+**Impact**: 10/10 | **Tijd**: 3 uur | **Voltooid**: 20 nov 2025
+
+**Wat**: Agent wordt expert HR consultant met 15+ jaar ervaring
+
+**Implementatie**:
+- Voeg HR-expertise toe aan system prompt
+- Definieer consultancy frameworks
+- Specificeer gespreksstijl (warm, professioneel, nieuwsgierig)
+- Bouw doorvraag-principes in
+
+**Acceptatie**:
+- [x] Domeinspecifieke kennis aanwezig (HR-transformatie, change management, etc.)
+- [x] Conversatie-principes gedefinieerd (5 belangrijke principes)
+- [x] Doorvraag-triggers ingebouwd (bij korte/vage/algemene antwoorden)
+- [x] Empathie gebalanceerd (bij frustratie, tijdsdruk, complexiteit)
+
+**Geïmplementeerd**:
+- 15+ jaar HR-consultant ervaring persona
+- McKinsey 7S, ADKAR, HR Value Chain frameworks
+- Sector-specifieke kennis (IT, Healthcare, Finance, Retail, Manufacturing)
+- 5 doorvraag-principes met concrete voorbeelden
+- Empathische reactie-templates
+- Contextuele vraagstelling instructies
+
+**Test Status**: ⚠️ Gedeeltelijk getest
+
+**Test Resultaten**:
+- ✅ Deployment succesvol (commit 55b563f)
+- ✅ Applicatie start correct
+- ✅ Interview template selectie werkt
+- ✅ Eerste bericht (start) werkt correct
+- ⚠️ Anthropic API 529 error (overloaded) bij follow-up
+- 🔧 Actie: Retry mechanisme nodig + betere error handling
+
+**Bevindingen**:
+- System prompt is succesvol gedeployed
+- Eerste bericht toont nog oude welkomstboodschap (hardcoded)
+- API overload errors moeten graceful worden afgehandeld
+- Retry logica ontbreekt
+
+**Volgende Stappen**:
+1. Voeg retry mechanisme toe voor API calls
+2. Test opnieuw wanneer API beschikbaar is
+3. Verifieer doorvraag-gedrag in praktijk
+
+---
+
+### ⬜ 1.2: Fase-Specifieke Instructies
+**Impact**: 9/10 | **Tijd**: 2 uur
+
+**Wat**: Elke fase heeft eigen focus en diepgang
+
+**Implementatie**:
+- Definieer focus per fase
+- Stel min/max vragen per fase
+- Bepaal doorvraag-triggers per fase
+- Documenteer technieken per fase
+
+**Acceptatie**:
+- [ ] Alle 11 fases hebben instructies
+- [ ] Min/max vragen bepaald
+- [ ] Doorvraag-triggers per fase
+- [ ] Technieken gedocumenteerd
+
+---
+
+## 🟠 PRIORITEIT 2: VRAAGSTELLING
+
+### ⬜ 2.1: Doorvraag-Logica
+**Impact**: 10/10 | **Tijd**: 4 uur
+
+**Wat**: Automatische doorvragen bij oppervlakkige antwoorden
+
+**Implementatie**:
+- Analyseer antwoord-diepte (woordenaantal, cijfers, voorbeelden)
+- Genereer doorvragen op basis van analyse
+- 4 types: elaboration, concrete_example, quantify, why
+- Max 2 doorvragen per hoofdvraag
+
+**Acceptatie**:
+- [ ] Diepte-analyse werkt
+- [ ] Doorvragen automatisch gegenereerd
+- [ ] 4 doorvraag-types beschikbaar
+- [ ] Max 2 doorvragen per vraag
+
+---
+
+### ⬜ 2.2: Vraag-Variatie
+**Impact**: 7/10 | **Tijd**: 2 uur
+
+**Wat**: Voorkom repetitieve vraagstelling
+
+**Implementatie**:
+- 3-4 variaties per vraagtype
+- Track gebruikte variaties
+- Natuurlijke taalvariatie
+
+**Acceptatie**:
+- [ ] Minimaal 3-4 variaties per type
+- [ ] Tracking van gebruikte variaties
+- [ ] Natuurlijke taal
+
+---
+
+### ⬜ 2.3: Contextuele Vraagstelling
+**Impact**: 9/10 | **Tijd**: 3 uur
+
+**Wat**: Vragen bouwen voort op eerdere antwoorden
+
+**Implementatie**:
+- Extract key context uit eerdere antwoorden
+- Refereer aan eerdere punten in nieuwe vragen
+- Natuurlijke overgangen
+
+**Acceptatie**:
+- [ ] 30%+ vragen refereert aan eerder
+- [ ] Natuurlijke overgangen
+- [ ] Geen geforceerde verbindingen
+
+---
+
+## 🟡 PRIORITEIT 3: CONVERSATIE FLOW
+
+### ⬜ 3.1: Samenvattingen
+**Impact**: 8/10 | **Tijd**: 2 uur
+
+**Wat**: Toon dat agent luistert en begrijpt
+
+**Implementatie**:
+- Samenvatting bij fase-overgang
+- Elke 4 vragen korte samenvatting
+- Validatie-vraag aan einde
+
+**Acceptatie**:
+- [ ] Samenvattingen bij fase-overgangen
+- [ ] Periodieke samenvattingen
+- [ ] Validatie-vraag
+- [ ] Correctie mogelijk
+
+---
+
+### ⬜ 3.2: Empathische Reacties
+**Impact**: 8/10 | **Tijd**: 2 uur
+
+**Wat**: Toon begrip voor uitdagingen
+
+**Implementatie**:
+- Detecteer frustratie/stress/complexiteit
+- Voeg empathische reactie toe
+- Natuurlijke integratie
+
+**Acceptatie**:
+- [ ] Empathie bij frustratie-signalen
+- [ ] Natuurlijke integratie
+- [ ] Niet overdreven
+
+---
+
+### ⬜ 3.3: Transitie-Zinnen
+**Impact**: 6/10 | **Tijd**: 1 uur
+
+**Wat**: Soepele overgangen tussen onderwerpen
+
+**Implementatie**:
+- Transitie-zinnen voor same_topic, new_topic, fase_transition
+- Variatie in zinnen
+
+**Acceptatie**:
+- [ ] Natuurlijke overgangen
+- [ ] Duidelijke fase-overgangen
+- [ ] Variatie in zinnen
+
+---
+
+## 🟢 PRIORITEIT 4: PSYCHOLOGIE
+
+### ⬜ 4.1: Progressie-Feedback
+**Impact**: 9/10 | **Tijd**: 2 uur
+
+**Wat**: Motiveer door voortgang te tonen
+
+**Implementatie**:
+- Feedback bij 25%, 50%, 75%, 90%
+- Positieve, motiverende toon
+- Eenmalig per milestone
+
+**Acceptatie**:
+- [ ] Feedback bij milestones
+- [ ] Positieve toon
+- [ ] Eenmalig
+- [ ] Niet opdringerig
+
+---
+
+### ⬜ 4.2: Waarde-Signalen
+**Impact**: 8/10 | **Tijd**: 2 uur
+
+**Wat**: Laat zien dat informatie waardevol is
+
+**Implementatie**:
+- ~30% antwoorden bevat waarde-signaal
+- Variatie in signalen
+
+**Acceptatie**:
+- [ ] 30% bevat waarde-signaal
+- [ ] Natuurlijke integratie
+- [ ] Variatie
+- [ ] Niet repetitief
+
+---
+
+### ⬜ 4.3: Nieuwsgierigheid-Triggers
+**Impact**: 7/10 | **Tijd**: 2 uur
+
+**Wat**: Maak gebruiker nieuwsgierig naar volgende stappen
+
+**Implementatie**:
+- Triggers op strategische momenten (fase 3, 5, 7, 9)
+- Creëer anticipatie
+
+**Acceptatie**:
+- [ ] Triggers op strategische momenten
+- [ ] Creëert anticipatie
+- [ ] Niet te veel beloven
+
+---
+
+## 🔵 PRIORITEIT 5: VALIDATIE
+
+### ⬜ 5.1: Antwoord-Validatie
+**Impact**: 9/10 | **Tijd**: 3 uur
+
+**Wat**: Detecteer incomplete/inconsistente antwoorden
+
+**Implementatie**:
+- Check completeness, consistency, specificity, relevance
+- Genereer vriendelijke validatie-vragen
+- Max 1 validatie per antwoord
+
+**Acceptatie**:
+- [ ] Validatie voor alle vraagtypen
+- [ ] Vriendelijke validatie-vragen
+- [ ] Max 1 validatie per antwoord
+- [ ] Logging
+
+---
+
+### ⬜ 5.2: Consistentie-Checks
+**Impact**: 7/10 | **Tijd**: 2 uur
+
+**Wat**: Detecteer tegenstrijdigheden
+
+**Implementatie**:
+- Check logische inconsistenties
+- Vriendelijke clarificatie-vragen
+- Optioneel (niet blokkeren)
+
+**Acceptatie**:
+- [ ] Detectie inconsistenties
+- [ ] Vriendelijke vragen
+- [ ] Niet confronterend
+- [ ] Optioneel
+
+---
+
+## 🟣 PRIORITEIT 6: ENGAGEMENT
+
+### ⬜ 6.1: Micro-Commitments
+**Impact**: 8/10 | **Tijd**: 2 uur
+
+**Wat**: Verhoog completion door kleine commitments
+
+**Implementatie**:
+- Vraag commitment bij start, fase 2, 5, 8
+- Tijd-indicatie
+- Optioneel
+
+**Acceptatie**:
+- [ ] Commitments op strategische momenten
+- [ ] Optioneel
+- [ ] Positieve framing
+- [ ] Accurate tijd-indicatie
+
+---
+
+### ⬜ 6.2: Personalisatie
+**Impact**: 9/10 | **Tijd**: 3 uur
+
+**Wat**: Maak gesprek persoonlijker
+
+**Implementatie**:
+- Gebruik naam
+- Sector-specifieke voorbeelden
+- Rol-aangepaste taal
+
+**Acceptatie**:
+- [ ] Naam-gebruik
+- [ ] Sector-specifieke voorbeelden
+- [ ] Rol-aangepaste taal
+- [ ] Natuurlijke integratie
+
+---
+
+### ⬜ 6.3: Interactieve Elementen
+**Impact**: 7/10 | **Tijd**: 3 uur
+
+**Wat**: Maak gesprek dynamischer
+
+**Implementatie**:
+- Quick polls (slider, choice)
+- Visuele feedback (confetti, checkmarks)
+- 2-3 interactieve elementen
+
+**Acceptatie**:
+- [ ] 2-3 interactieve elementen
+- [ ] Niet opdringerig
+- [ ] Voegt waarde toe
+- [ ] Mobile-friendly
+
+---
+
+## 📈 SUCCES METRICS
+
+1. **Completion Rate**: 75%+ (was 40%)
+2. **Sessieduur**: 35-45 min (was 15 min)
+3. **Antwoord Kwaliteit**: 7.5/10
+4. **Doorvraag Ratio**: 30-40%
+5. **Tevredenheid**: 8/10
+6. **Drop-off Points**: Identificeer en minimaliseer
+
+---
+
+## 🎯 IMPLEMENTATIE ROADMAP
+
+### **WEEK 1: Foundation**
+- Taak 1.1: System Prompt
+- Taak 1.2: Fase-Instructies
+- Taak 2.1: Doorvraag-Logica
+
+### **WEEK 2: Conversation Quality**
+- Taak 2.2: Vraag-Variatie
+- Taak 2.3: Contextuele Vraagstelling
+- Taak 3.1: Samenvattingen
+- Taak 3.2: Empathische Reacties
+
+### **WEEK 3: Engagement**
+- Taak 4.1: Progressie-Feedback
+- Taak 4.2: Waarde-Signalen
+- Taak 5.1: Antwoord-Validatie
+- Taak 6.1: Micro-Commitments
+
+### **WEEK 4: Polish & Test**
+- Taak 3.3: Transitie-Zinnen
+- Taak 4.3: Nieuwsgierigheid-Triggers
+- Taak 5.2: Consistentie-Checks
+- Taak 6.2: Personalisatie
+- Taak 6.3: Interactieve Elementen
+- A/B Testing
+- Metrics Dashboard
+
+---
+
+## 📝 VOLGENDE STAPPEN
+
+1. **Review dit plan** - Prioriteiten akkoord?
+2. **Start met Taak 1.1** - System Prompt optimalisatie
+3. **Iteratief implementeren** - Test na elke taak
+4. **Metrics bijhouden** - Meet impact van elke verbetering
+5. **Aanpassen op basis van data** - Blijf optimaliseren
+
+---
+
+**Klaar om te beginnen?** Laten we starten met Taak 1.1: System Prompt Optimalisatie! 🚀

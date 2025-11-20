@@ -217,15 +217,35 @@ Als bevestigd, output JSON met:
                                 "content": msg["content"]
                             })
                     
-                    # Call Claude
-                    response = client.messages.create(
-                        model=os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
-                        max_tokens=1024,
-                        system=system_prompt,
-                        messages=messages
-                    )
+                    # Call Claude with retry logic for overload errors
+                    import time
+                    max_retries = 3
+                    retry_delay = 2  # seconds
                     
-                    ai_message = response.content[0].text
+                    for attempt in range(max_retries):
+                        try:
+                            response = client.messages.create(
+                                model=os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
+                                max_tokens=1024,
+                                system=system_prompt,
+                                messages=messages
+                            )
+                            ai_message = response.content[0].text
+                            break  # Success, exit retry loop
+                        except Exception as e:
+                            error_str = str(e)
+                            # Check if it's an overload error (529)
+                            if "overloaded" in error_str.lower() or "529" in error_str:
+                                if attempt < max_retries - 1:
+                                    # Wait before retry
+                                    time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                                    continue
+                                else:
+                                    # Last attempt failed
+                                    raise Exception(f"API overbelast na {max_retries} pogingen. Probeer het over een paar seconden opnieuw.")
+                            else:
+                                # Other error, don't retry
+                                raise
                 
                 # Check for JSON output (fase complete)
                 partial_json = self.extract_json(ai_message)
