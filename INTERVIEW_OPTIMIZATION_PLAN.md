@@ -646,8 +646,8 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 
 ---
 
-### ⬜ 6.3: Interactieve Elementen
-**Impact**: 7/10 | **Tijd**: 3 uur
+### ✅ 6.3: Interactieve Elementen
+**Impact**: 7/10 | **Tijd**: 3 uur | **Voltooid**: 20 nov 2025
 
 **Wat**: Maak gesprek dynamischer
 
@@ -657,10 +657,53 @@ De doorvraag-logica is **geïntegreerd in de AI system prompt** (Taak 1.1 en 1.2
 - 2-3 interactieve elementen
 
 **Acceptatie**:
-- [ ] 2-3 interactieve elementen
-- [ ] Niet opdringerig
-- [ ] Voegt waarde toe
-- [ ] Mobile-friendly
+- [x] 2-3 interactieve elementen (3 types)
+- [x] Niet opdringerig (max 2-3 per interview)
+- [x] Voegt waarde toe (alleen voor simpele vragen)
+- [x] Mobile-friendly (tekst-gebaseerd formaat)
+
+**Geïmplementeerd** (commit df8db95):
+- **3 Types interactieve elementen**:
+  1. **Quick Choices** (meerkeuzevragen A/B/C/D):
+     - Organisatie-grootte, sector, situatie
+     - Grootste uitdaging
+     - 3 voorbeelden met 3-4 opties
+  
+  2. **Schaal-vragen** (1-10 of 1-5):
+     - Tevredenheid huidige processen
+     - Urgentie implementatie
+     - Belangrijkheid automatisering
+     - 3 voorbeelden
+  
+  3. **Ja/Nee vragen** (snelle bevestiging):
+     - Externe partijen, meerdere vestigingen, budget
+     - 3 voorbeelden
+
+- **Timing per fase**:
+  - Fase 1-2: Organisatie-grootte, sector (quick choice)
+  - Fase 3-4: Huidige situatie, tevredenheid (schaal)
+  - Fase 5-6: Systemen, processen (ja/nee)
+  - Fase 9-10: Urgentie, prioriteit (schaal)
+
+- **Regels**:
+  - Max 2-3 interactieve elementen per interview
+  - Alleen voor simpele vragen
+  - Altijd optie voor open antwoord: "Of typ je eigen antwoord"
+  - Niet opdringerig
+
+**Formaat**:
+```
+Hoe groot is jullie organisatie?
+
+A) 1-50 medewerkers
+B) 51-250 medewerkers
+C) 251-1000 medewerkers
+D) 1000+ medewerkers
+
+Of typ het exacte aantal.
+```
+
+**Test Status**: ⏸️ Uitgesteld - API overbelast (test later handmatig)
 
 ---
 
