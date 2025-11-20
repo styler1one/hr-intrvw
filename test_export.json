@@ -1,0 +1,39 @@
+{
+  "interview_metadata": {
+    "template": "standard",
+    "started_at": "2025-11-20T15:00:00",
+    "completed_at": "2025-11-20T15:30:00",
+    "total_fases": 11,
+    "current_fase": 1,
+    "total_messages": 2
+  },
+  "structured_data": {
+    "fase_1": {
+      "fase_name": "Organisatie Context",
+      "data": {
+        "organisatie_naam": "Test BV",
+        "sector": "IT",
+        "aantal_medewerkers": 85
+      }
+    }
+  },
+  "conversation": [
+    {
+      "role": "assistant",
+      "content": "Hallo!",
+      "timestamp": "2025-11-20T15:00:00"
+    },
+    {
+      "role": "user",
+      "content": "We zijn een tech startup",
+      "timestamp": "2025-11-20T15:01:00"
+    }
+  ],
+  "statistics": {
+    "followup_stats": {
+      "total_questions": 5,
+      "followup_questions": 2
+    },
+    "progress_percentage": 9.090909090909092
+  }
+}

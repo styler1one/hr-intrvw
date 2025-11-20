@@ -138,14 +138,31 @@
 **Complexiteit**: Medium  
 **Impact**: Hoog
 
-**Status**: 🔄 **BEZIG**  
-**Start tijd**: 20 nov 2025, 15:56
+**Status**: ✅ **VOLTOOID**  
+**Start tijd**: 20 nov 2025, 15:56  
+**Eind tijd**: 20 nov 2025, 16:03
 
 **Acceptatie criteria**:
-- [ ] `/api/export?format=json` werkt
-- [ ] `/api/export?format=csv` werkt
-- [ ] `/api/export?format=md` werkt
-- [ ] Download functionaliteit in UI
+- [x] `/api/export?format=json` werkt
+- [x] `/api/export?format=csv` werkt
+- [x] `/api/export?format=md` werkt
+- [ ] Download functionaliteit in UI (volgende taak)
+
+**Bevindingen**:
+- ✅ Export API endpoint werkt perfect
+- ✅ JSON export: Clean structured data met metadata
+- ✅ CSV export: Flattened data, Excel-compatible
+- ✅ Markdown export: Human-readable met formatting
+- ✅ Timestamps in filenames
+- ✅ CORS headers correct
+- ✅ Error handling aanwezig
+
+**Test resultaten**:
+- JSON: 39 regels, complete data structuur
+- CSV: 5 regels (header + 3 data fields + 1 fase)
+- Markdown: Mooi geformatteerd met emoji's en bullets
+
+**Commits**: 97f7427
 
 ---
 
