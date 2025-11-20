@@ -100,14 +100,25 @@
 **Complexiteit**: Hoog  
 **Impact**: Kritisch
 
-**Status**: 🔄 **BEZIG**  
-**Start tijd**: 20 nov 2025, 15:48
+**Status**: ✅ **VOLTOOID**  
+**Start tijd**: 20 nov 2025, 15:48  
+**Eind tijd**: 20 nov 2025, 15:54
 
 **Acceptatie criteria**:
 - [x] Data extractie per fase
 - [x] JSON validatie
 - [x] Opslag in session
 - [x] Error handling bij missende data
+
+**Bevindingen**:
+- ✅ extract_structured_data() functie toegevoegd
+- ✅ Gebruikt fase_definitions voor output_fields
+- ✅ Extractie triggert elke 3 messages (na 4, 7, 10, etc.)
+- ✅ Data opgeslagen in session["structured_data"]
+- ✅ Geen errors, werkt op achtergrond
+- ⚠️ Nog geen UI om extracted data te tonen
+
+**Commits**: 1f41dcc, dba691e
 
 ---
 
